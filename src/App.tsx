@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './utils/supabase';
 import { MatchItem, LiveMatchItem, PostItem, NotificationItem } from './types/football';
-import { NT, INITIAL_POSTS } from './lib/saviourData';
+import { NT } from './lib/saviourData';
 import { LandingPage } from './components/saviour/LandingPage';
 import { AuthPage } from './components/saviour/AuthPage';
 import { FeedPage } from './components/saviour/FeedPage';
@@ -334,82 +334,64 @@ export default function App() {
   const [legalKey, setLegalKey] = useState<'privacy' | 'terms' | 'responsible'>(initialRouteState.legalKey);
   const [legalBack, setLegalBack] = useState<'land' | 'app'>('land');
 
-  // Posts state with Real-Time Supabase Sync
-  const [posts, setPosts] = useState<PostItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('sa_posts2');
-      return saved ? JSON.parse(saved) : INITIAL_POSTS;
-    } catch {
-      return INITIAL_POSTS;
-    }
-  });
+  // Posts state strictly sourced from Supabase backend (empty if no posts in DB)
+  const [posts, setPosts] = useState<PostItem[]>([]);
 
+  // Load community feed strictly from Supabase & subscribe to real-time changes
   useEffect(() => {
+    // Purge any legacy cached mock posts
     try {
-      localStorage.setItem('sa_posts2', JSON.stringify(posts.slice(0, 30)));
+      localStorage.removeItem('sa_posts2');
     } catch {}
-  }, [posts]);
 
-  // Load live feed from Supabase & subscribe to real-time additions
-  useEffect(() => {
     async function loadSupabaseFeed() {
       try {
         const { data, error } = await supabase
           .from('feed_posts')
           .select('*')
           .order('id', { ascending: false })
-          .limit(40);
+          .limit(50);
 
-        if (data && data.length > 0 && !error) {
-          const mapped: PostItem[] = data.map((item: any) => ({
-            id: Number(item.id),
-            n: item.user_name || 'Community Tipper',
-            txt: item.caption || item.text || '',
-            img: item.img || undefined,
-            imgs: item.imgs || (item.img ? [item.img] : []),
-            code: item.booking_code || undefined,
-            bk: item.bookmaker || 'SportyBet',
-            t: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
-            lk: item.likes_count || 0,
-            liked: false,
-            cm: Array.isArray(item.comments) ? item.comments : [],
-          }));
-          setPosts(mapped);
+        if (!error && Array.isArray(data)) {
+          if (data.length > 0) {
+            const mapped: PostItem[] = data.map((item: any) => ({
+              id: Number(item.id),
+              n: item.user_name || 'Community Tipper',
+              txt: item.caption || item.text || '',
+              img: item.img || undefined,
+              imgs: Array.isArray(item.imgs) ? item.imgs : (item.img ? [item.img] : []),
+              code: item.booking_code || undefined,
+              bk: item.bookmaker || 'SportyBet',
+              t: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
+              lk: Number(item.likes_count || 0),
+              liked: false,
+              cm: Array.isArray(item.comments) ? item.comments : [],
+            }));
+            setPosts(mapped);
+          } else {
+            // No posts in database -> empty feed
+            setPosts([]);
+          }
+        } else {
+          // If table is empty or error occurs
+          setPosts([]);
         }
       } catch (err) {
-        console.warn('Supabase feed load fallback to local store:', err);
+        console.warn('Supabase feed query error:', err);
+        setPosts([]);
       }
     }
 
     loadSupabaseFeed();
 
-    // Subscribe to live Postgres changes
+    // Subscribe to live Postgres changes across all events (INSERT, UPDATE, DELETE)
     const channel = supabase
       .channel('realtime_feed')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'feed_posts' },
-        (payload) => {
-          const newItem = payload.new;
-          if (newItem) {
-            const mapped: PostItem = {
-              id: Number(newItem.id),
-              n: newItem.user_name || 'Community Tipper',
-              txt: newItem.caption || newItem.text || '',
-              img: newItem.img || undefined,
-              imgs: newItem.imgs || (newItem.img ? [newItem.img] : []),
-              code: newItem.booking_code || undefined,
-              bk: newItem.bookmaker || 'SportyBet',
-              t: newItem.created_at ? new Date(newItem.created_at).getTime() : Date.now(),
-              lk: newItem.likes_count || 0,
-              liked: false,
-              cm: Array.isArray(newItem.comments) ? newItem.comments : [],
-            };
-            setPosts((prev) => {
-              if (prev.some((p) => p.id === mapped.id)) return prev;
-              return [mapped, ...prev];
-            });
-          }
+        { event: '*', schema: 'public', table: 'feed_posts' },
+        () => {
+          loadSupabaseFeed();
         }
       )
       .subscribe();
@@ -578,30 +560,49 @@ export default function App() {
 
   // Post Actions with Supabase real-time persistence
   const handleAddPost = async (newPost: Omit<PostItem, 'id' | 't' | 'lk' | 'liked' | 'cm'>) => {
-    const created: PostItem = {
-      ...newPost,
-      id: Date.now(),
-      t: Date.now(),
-      lk: 0,
-      liked: false,
-      cm: [],
-    };
-    setPosts([created, ...posts]);
-
     try {
-      await supabase.from('feed_posts').insert([
+      const { data, error } = await supabase.from('feed_posts').insert([
         {
           user_name: newPost.n,
           user_email: user?.e || '',
-          caption: newPost.txt,
+          caption: newPost.txt || '',
+          img: newPost.img || null,
+          imgs: newPost.imgs || (newPost.img ? [newPost.img] : []),
           booking_code: newPost.code || null,
           bookmaker: newPost.bk || 'SportyBet',
           likes_count: 0,
           comments: [],
         },
-      ]);
+      ]).select();
+
+      if (!error && data && data[0]) {
+        const created: PostItem = {
+          id: Number(data[0].id),
+          n: data[0].user_name,
+          txt: data[0].caption,
+          img: data[0].img,
+          imgs: data[0].imgs,
+          code: data[0].booking_code,
+          bk: data[0].bookmaker,
+          t: new Date(data[0].created_at).getTime(),
+          lk: 0,
+          liked: false,
+          cm: [],
+        };
+        setPosts((prev) => [created, ...prev]);
+      } else {
+        const created: PostItem = {
+          ...newPost,
+          id: Date.now(),
+          t: Date.now(),
+          lk: 0,
+          liked: false,
+          cm: [],
+        };
+        setPosts((prev) => [created, ...prev]);
+      }
     } catch (err) {
-      console.warn('Supabase post insert fallback:', err);
+      console.warn('Supabase post insert note:', err);
     }
   };
 
@@ -897,6 +898,7 @@ export default function App() {
         <FeedPage
           user={user}
           posts={posts}
+          matches={matches}
           onAddPost={handleAddPost}
           onLikePost={handleLikePost}
           onAddComment={handleAddComment}

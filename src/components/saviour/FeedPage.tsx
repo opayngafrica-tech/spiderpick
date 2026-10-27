@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { PostItem } from '../../types/football';
+import { PostItem, MatchItem } from '../../types/football';
 import { Crest } from '../common/Crest';
 import { Ico, I } from '../common/Icons';
 import { WatermarkImage } from '../common/WatermarkLoader';
-import { ago, M, LV } from '../../lib/saviourData';
+import { ago } from '../../lib/saviourData';
 
 interface FeedPageProps {
   user: { n: string; e: string } | null;
   posts: PostItem[];
+  matches?: MatchItem[];
   onAddPost: (newPost: Omit<PostItem, 'id' | 't' | 'lk' | 'liked' | 'cm'>) => void;
   onLikePost: (postId: number) => void;
   onAddComment: (postId: number, comment: string) => void;
@@ -23,6 +24,7 @@ interface FeedPageProps {
 export const FeedPage: React.FC<FeedPageProps> = ({
   user,
   posts,
+  matches = [],
   onAddPost,
   onLikePost,
   onAddComment,
@@ -184,9 +186,7 @@ export const FeedPage: React.FC<FeedPageProps> = ({
     );
   };
 
-  const banker = M.find((m) => m.id === 1) || M[0];
-  const liveMatch = LV.find((x) => x.s === 0);
-  const liveM = liveMatch ? M.find((y) => y.id === liveMatch.id) : null;
+  const banker = matches.length > 0 ? (matches.find((m) => m.id === 1) || matches[0]) : null;
 
   return (
     <>
@@ -234,10 +234,71 @@ export const FeedPage: React.FC<FeedPageProps> = ({
           </div>
 
           {/* Posts Stream */}
-          {allPosts.map((p) => {
-            const isCommentOpen = openComments.has(p.id);
+          {allPosts.length === 0 ? (
+            <div
+              className="card rvs in"
+              style={{
+                textAlign: 'center',
+                padding: '52px 20px',
+                background: 'var(--s)',
+                borderRadius: '16px',
+                border: '1px solid var(--b)',
+                margin: '12px 0',
+              }}
+            >
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  background: 'rgba(10, 125, 55, 0.08)',
+                  color: 'var(--g)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 14px',
+                }}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
 
-            return (
+              <b style={{ fontSize: '18px', color: 'var(--tx)', display: 'block', marginBottom: '6px' }}>
+                No posts yet
+              </b>
+              <p style={{ fontSize: '13px', color: 'var(--mu)', margin: '0 auto 18px', maxWidth: '380px', lineHeight: 1.5 }}>
+                There are no community feed posts in the database yet. Be the first to share match predictions, tips, or booking codes!
+              </p>
+
+              <button
+                onClick={() => {
+                  if (!user && onOpenSignIn) {
+                    onOpenSignIn();
+                  } else {
+                    setSheetOpen(true);
+                  }
+                }}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '99px',
+                  background: 'var(--g)',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(10, 125, 55, 0.25)',
+                }}
+              >
+                {user ? '+ Create First Post' : 'Sign In to Post'}
+              </button>
+            </div>
+          ) : (
+            allPosts.map((p) => {
+              const isCommentOpen = openComments.has(p.id);
+
+              return (
               <article className="post" key={p.id}>
                 <div className="ph">
                   <span className="av">
@@ -410,41 +471,13 @@ export const FeedPage: React.FC<FeedPageProps> = ({
                 )}
               </article>
             );
-          })}
-
-          {allPosts.length === 0 && (
-            <div className="card" style={{ textAlign: 'center', padding: '54px 20px', background: 'var(--s)' }}>
-              <div
-                style={{
-                  width: '56px',
-                  height: '56px',
-                  borderRadius: '50%',
-                  background: 'rgba(10, 125, 55, 0.1)',
-                  color: 'var(--g)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 14px',
-                }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-              </div>
-              <b style={{ fontSize: '18px', display: 'block', color: 'var(--tx)', marginBottom: '6px' }}>
-                No posts yet
-              </b>
-              <p style={{ fontSize: '13px', color: 'var(--mu)', margin: '0 auto', maxWidth: '420px', lineHeight: 1.5 }}>
-                Predictions, community betting slips, and analysis will be published here by administrators. Check back shortly.
-              </p>
-            </div>
-          )}
+          }))}
         </div>
 
         {/* Right Sidebar (Desktop & Tablet View) */}
         <div className="hidden md:block space-y-4" style={{ position: 'sticky', top: '80px' }}>
-          {/* Banker Highlight Card (Only if matches exist) */}
-          {M.length > 0 && banker && (
+          {/* Banker Highlight Card (Only if real matches exist) */}
+          {banker && (
             <div className="card" style={{ padding: '16px', background: 'var(--s)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--g)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
