@@ -1,0 +1,6 @@
+{
+  "name": "Saviour Analysis - Football Predictions & Analytics",
+  "description": "Professional football analysis, AI-powered match predictions, live scores, team form trends, and VIP betting intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
