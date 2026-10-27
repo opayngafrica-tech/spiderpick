@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Ico, I } from '../common/Icons';
 import { Crest } from '../common/Crest';
 import { UnifiedNavbar } from '../common/UnifiedNavbar';
+import { MatchItem } from '../../types/football';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -13,6 +14,7 @@ interface LandingPageProps {
   onSignOut?: () => void;
   onOpenLegal: (key: 'privacy' | 'terms' | 'responsible') => void;
   onOpenMenu?: () => void;
+  matches?: MatchItem[];
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
@@ -25,6 +27,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onSignOut,
   onOpenLegal,
   onOpenMenu,
+  matches = [],
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -368,79 +371,111 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '16px',
-            maxWidth: '960px',
-            margin: '0 auto 24px',
-          }}
-        >
-          {[
-            { home: "Arsenal", away: "Chelsea", league: "Premier League", time: "Tonight, 20:00", tip: "Over 1.5 Goals", odds: 1.35, conf: 88 },
-            { home: "Real Madrid", away: "Bayern Munich", league: "Champions League", time: "Tonight, 21:00", tip: "Both Teams To Score", odds: 1.62, conf: 82 },
-            { home: "Barcelona", away: "Atletico Madrid", league: "La Liga", time: "Tomorrow, 20:00", tip: "Home Win", odds: 1.75, conf: 84 },
-          ].map((item, idx) => (
+        {matches.length === 0 ? (
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '40px 20px',
+              background: 'var(--s)',
+              border: '1px solid var(--ln)',
+              borderRadius: '16px',
+              maxWidth: '540px',
+              margin: '0 auto 24px',
+            }}
+          >
             <div
-              key={idx}
-              className={`rvs up${idx + 1}`}
               style={{
-                background: 'var(--s)',
-                border: '1px solid var(--ln)',
-                borderRadius: '16px',
-                padding: '18px 16px',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
-                transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease',
-                cursor: 'pointer',
-              }}
-              onClick={() => onNavigateApp ? onNavigateApp('picks') : onGetStarted()}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 10px 24px rgba(10, 125, 55, 0.14)';
-                e.currentTarget.style.borderColor = 'var(--g)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)';
-                e.currentTarget.style.borderColor = 'var(--ln)';
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: 'rgba(10, 125, 55, 0.08)',
+                color: 'var(--g)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 12px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--g)', background: 'rgba(10, 125, 55, 0.1)', padding: '2px 8px', borderRadius: '99px' }}>
-                  {item.league}
-                </span>
-                <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 600 }}>{item.time}</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Crest name={item.home} />
-                    <span style={{ fontWeight: 800, fontSize: '14px', color: 'var(--tx)' }}>{item.home}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Crest name={item.away} />
-                    <span style={{ fontWeight: 800, fontSize: '14px', color: 'var(--tx)' }}>{item.away}</span>
-                  </div>
-                </div>
-
-                <div style={{ textAlign: 'right', background: 'var(--s2)', padding: '8px 12px', borderRadius: '10px' }}>
-                  <b style={{ color: 'var(--g)', fontSize: '16px', display: 'block' }}>{item.conf}%</b>
-                  <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 600 }}>Confidence</span>
-                </div>
-              </div>
-
-              <div style={{ paddingTop: '10px', borderTop: '1px solid var(--ln)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <small style={{ fontSize: '11px', color: 'var(--mu)', display: 'block' }}>Banker Selection</small>
-                  <b style={{ fontSize: '13px', color: 'var(--tx)' }}>{item.tip}</b>
-                </div>
-                <div style={{ fontSize: '13px', fontWeight: 900, color: 'var(--g)' }}>@{item.odds.toFixed(2)}</div>
-              </div>
+              <Ico path={I.b} />
             </div>
-          ))}
-        </div>
+            <b style={{ fontSize: '16px', color: 'var(--tx)', display: 'block', marginBottom: '4px' }}>
+              No games published today yet
+            </b>
+            <p style={{ fontSize: '12px', color: 'var(--mu)', margin: 0 }}>
+              Our expert analysts are verifying algorithmic confidence metrics. Check back soon for today's banker picks!
+            </p>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '16px',
+              maxWidth: '960px',
+              margin: '0 auto 24px',
+            }}
+          >
+            {matches.slice(0, 3).map((item, idx) => (
+              <div
+                key={item.id || idx}
+                className={`rvs up${idx + 1}`}
+                style={{
+                  background: 'var(--s)',
+                  border: '1px solid var(--ln)',
+                  borderRadius: '16px',
+                  padding: '18px 16px',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                  transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease',
+                  cursor: 'pointer',
+                }}
+                onClick={() => onNavigateApp ? onNavigateApp('picks') : onGetStarted()}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 10px 24px rgba(10, 125, 55, 0.14)';
+                  e.currentTarget.style.borderColor = 'var(--g)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)';
+                  e.currentTarget.style.borderColor = 'var(--ln)';
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--g)', background: 'rgba(10, 125, 55, 0.1)', padding: '2px 8px', borderRadius: '99px' }}>
+                    {item.l}
+                  </span>
+                  <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 600 }}>{item.t}</span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Crest name={item.h} />
+                      <span style={{ fontWeight: 800, fontSize: '14px', color: 'var(--tx)' }}>{item.h}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Crest name={item.a} />
+                      <span style={{ fontWeight: 800, fontSize: '14px', color: 'var(--tx)' }}>{item.a}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'right', background: 'var(--s2)', padding: '8px 12px', borderRadius: '10px' }}>
+                    <b style={{ color: 'var(--g)', fontSize: '16px', display: 'block' }}>{item.c}%</b>
+                    <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 600 }}>Confidence</span>
+                  </div>
+                </div>
+
+                <div style={{ paddingTop: '10px', borderTop: '1px solid var(--ln)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <small style={{ fontSize: '11px', color: 'var(--mu)', display: 'block' }}>Banker Selection</small>
+                    <b style={{ fontSize: '13px', color: 'var(--tx)' }}>{item.tip}</b>
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 900, color: 'var(--g)' }}>@{Number(item.o || 1.5).toFixed(2)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div style={{ textAlign: 'center' }}>
           <button

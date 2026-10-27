@@ -117,10 +117,11 @@ export const UnifiedNavbar: React.FC<UnifiedNavbarProps> = ({
             Membership
           </a>
           <a
-            onClick={() => handleSectionClick('faq')}
+            className={!isLandingPage && (currentRoute === '' || currentRoute === 'feed') ? 'active' : ''}
+            onClick={() => onNavigateApp('')}
             style={{ cursor: 'pointer' }}
           >
-            FAQ
+            Feed
           </a>
         </div>
 

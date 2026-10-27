@@ -54,3 +54,22 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN NULL;
 END $$;
+
+-- 4. Users can delete feed posts
+DO $$
+BEGIN
+    DROP POLICY IF EXISTS "Delete feed posts" ON public.feed_posts;
+    CREATE POLICY "Delete feed posts" ON public.feed_posts
+        FOR DELETE
+        USING (true);
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END $$;
+
+-- 5. Enable Realtime Replication for feed_posts table
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.feed_posts;
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END $$;

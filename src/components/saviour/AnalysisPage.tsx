@@ -307,19 +307,19 @@ SpiderPicks AI Football Engine`;
           <div
             className="up1 rvs"
             style={{
-              background: '#ffffff',
+              background: 'var(--s)',
               borderRadius: '16px',
               padding: '24px 20px',
               marginBottom: '18px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+              border: '1px solid var(--ln)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span
                   style={{
-                    background: '#0a7d37',
+                    background: 'var(--g)',
                     color: '#ffffff',
                     fontSize: '11px',
                     fontWeight: 800,
@@ -331,7 +331,7 @@ SpiderPicks AI Football Engine`;
                 >
                   AI Football Analysis
                 </span>
-                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)', fontWeight: 600 }}>
                   Master Prediction Engine
                 </span>
               </div>
@@ -348,7 +348,7 @@ SpiderPicks AI Football Engine`;
                   borderRadius: '99px',
                   fontSize: '11px',
                   fontWeight: 800,
-                  color: isVip ? '#059669' : dailyAnalysisCount >= 5 ? '#dc2626' : '#0a7d37',
+                  color: isVip ? '#059669' : dailyAnalysisCount >= 5 ? '#dc2626' : 'var(--g)',
                 }}
               >
                 <span>{isVip ? '★ Unlimited VIP Access' : `AI Daily Quota: ${Math.max(0, 5 - dailyAnalysisCount)}/5 left`}</span>
@@ -360,7 +360,7 @@ SpiderPicks AI Football Engine`;
                 fontSize: 'clamp(20px, 3.8vw, 26px)',
                 fontWeight: 900,
                 letterSpacing: '-0.4px',
-                color: '#0f172a',
+                color: 'var(--tx)',
                 margin: '0 0 8px',
               }}
             >
@@ -370,7 +370,7 @@ SpiderPicks AI Football Engine`;
             <p
               style={{
                 fontSize: '13px',
-                color: '#475569',
+                color: 'var(--mu)',
                 lineHeight: 1.5,
                 margin: 0,
                 maxWidth: '720px',
@@ -384,19 +384,19 @@ SpiderPicks AI Football Engine`;
           <div
             className="up2 rvs in"
             style={{
-              background: '#ffffff',
+              background: 'var(--s)',
               borderRadius: '16px',
               padding: '22px 18px',
               marginBottom: '18px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+              border: '1px solid var(--ln)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
             }}
           >
             <div style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                 <span
                   style={{
-                    background: '#0a7d37',
+                    background: 'var(--g)',
                     color: '#ffffff',
                     fontSize: '10px',
                     fontWeight: 800,
@@ -407,11 +407,11 @@ SpiderPicks AI Football Engine`;
                 >
                   Featured
                 </span>
-                <h2 style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                <h2 style={{ fontSize: '16px', fontWeight: 900, color: 'var(--tx)', margin: 0 }}>
                   Manual Match Analysis (World Football)
                 </h2>
               </div>
-              <span style={{ fontSize: '12px', color: '#64748b' }}>
+              <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                 Type in any two clubs or national teams worldwide to open an in-depth AI analysis page or copy the Master Prompt
               </span>
             </div>
@@ -426,7 +426,7 @@ SpiderPicks AI Football Engine`;
                 }}
               >
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: '#475569', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: 'var(--mu)', marginBottom: '4px' }}>
                     Home Team
                   </label>
                   <input
@@ -438,16 +438,17 @@ SpiderPicks AI Football Engine`;
                       width: '100%',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      background: 'var(--s2)',
+                      border: '1px solid var(--ln)',
                       fontSize: '13px',
-                      color: '#0f172a',
+                      color: 'var(--tx)',
                       outline: 'none',
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: '#475569', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: 'var(--mu)', marginBottom: '4px' }}>
                     Away Team
                   </label>
                   <input
@@ -459,16 +460,17 @@ SpiderPicks AI Football Engine`;
                       width: '100%',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      background: 'var(--s2)',
+                      border: '1px solid var(--ln)',
                       fontSize: '13px',
-                      color: '#0f172a',
+                      color: 'var(--tx)',
                       outline: 'none',
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: '#475569', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: 'var(--mu)', marginBottom: '4px' }}>
                     League / Competition
                   </label>
                   <input
@@ -480,16 +482,17 @@ SpiderPicks AI Football Engine`;
                       width: '100%',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      background: 'var(--s2)',
+                      border: '1px solid var(--ln)',
                       fontSize: '13px',
-                      color: '#0f172a',
+                      color: 'var(--tx)',
                       outline: 'none',
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: '#475569', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: 'var(--mu)', marginBottom: '4px' }}>
                     Date / Time of Game
                   </label>
                   <input
@@ -501,9 +504,10 @@ SpiderPicks AI Football Engine`;
                       width: '100%',
                       padding: '10px 14px',
                       borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      background: 'var(--s2)',
+                      border: '1px solid var(--ln)',
                       fontSize: '13px',
-                      color: '#0f172a',
+                      color: 'var(--tx)',
                       outline: 'none',
                     }}
                   />
@@ -517,7 +521,7 @@ SpiderPicks AI Football Engine`;
                   style={{
                     padding: '11px 24px',
                     borderRadius: '8px',
-                    background: '#0a7d37',
+                    background: 'var(--g)',
                     color: '#ffffff',
                     fontWeight: 800,
                     fontSize: '13px',
@@ -549,18 +553,18 @@ SpiderPicks AI Football Engine`;
                   style={{
                     padding: '11px 20px',
                     borderRadius: '8px',
-                    background: '#0f172a',
-                    color: '#ffffff',
+                    background: 'var(--s2)',
+                    border: '1px solid var(--ln)',
+                    color: 'var(--tx)',
                     fontWeight: 800,
                     fontSize: '13px',
-                    border: 'none',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
                   }}
                 >
-                  <CopyIcon size={15} color="#ffffff" />
+                  <CopyIcon size={15} color="var(--tx)" />
                   <span>Copy Master Prompt for External AI</span>
                 </button>
               </div>
@@ -571,20 +575,20 @@ SpiderPicks AI Football Engine`;
           <div
             className="up3 rvs in"
             style={{
-              background: '#ffffff',
+              background: 'var(--s)',
               borderRadius: '16px',
               padding: '20px 18px',
               marginBottom: '18px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+              border: '1px solid var(--ln)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
             }}
           >
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '14px' }}>
               <div>
-                <h2 style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                <h2 style={{ fontSize: '16px', fontWeight: 900, color: 'var(--tx)', margin: 0 }}>
                   Today's Fixtures & Live Matches
                 </h2>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                   Touch any live fixture to launch its deep statistical prediction breakdown
                 </span>
               </div>
@@ -598,8 +602,10 @@ SpiderPicks AI Football Engine`;
                 style={{
                   padding: '8px 14px',
                   borderRadius: '8px',
-                  border: '1px solid #cbd5e1',
+                  background: 'var(--s2)',
+                  border: '1px solid var(--ln)',
                   fontSize: '12px',
+                  color: 'var(--tx)',
                   outline: 'none',
                   maxWidth: '260px',
                   width: '100%',
@@ -613,9 +619,9 @@ SpiderPicks AI Football Engine`;
                 style={{
                   textAlign: 'center',
                   padding: '44px 16px',
-                  background: '#f8fafc',
+                  background: 'var(--s2)',
                   borderRadius: '12px',
-                  border: '1px dashed #cbd5e1',
+                  border: '1px dashed var(--ln)',
                 }}
               >
                 <div
@@ -624,19 +630,19 @@ SpiderPicks AI Football Engine`;
                     height: '48px',
                     borderRadius: '50%',
                     background: 'rgba(10, 125, 55, 0.08)',
-                    color: '#0a7d37',
+                    color: 'var(--g)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     margin: '0 auto 12px',
                   }}
                 >
-                  <AlertIcon size={24} color="#0a7d37" />
+                  <AlertIcon size={24} color="var(--g)" />
                 </div>
-                <b style={{ fontSize: '15px', color: '#0f172a', display: 'block', marginBottom: '4px' }}>
+                <b style={{ fontSize: '15px', color: 'var(--tx)', display: 'block', marginBottom: '4px' }}>
                   No match features
                 </b>
-                <p style={{ fontSize: '12px', color: '#64748b', margin: '0 auto', maxWidth: '380px', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '12px', color: 'var(--mu)', margin: '0 auto', maxWidth: '380px', lineHeight: 1.5 }}>
                   No live match features currently streaming. When matches kick off, fixtures will automatically appear here for real-time statistical modeling.
                 </p>
               </div>
@@ -663,9 +669,9 @@ SpiderPicks AI Football Engine`;
                           borderRadius: '99px',
                           fontSize: '12px',
                           fontWeight: isActive ? 800 : 600,
-                          background: isActive ? '#0a7d37' : '#f1f5f9',
-                          color: isActive ? '#ffffff' : '#334155',
-                          border: 'none',
+                          background: isActive ? 'var(--g)' : 'var(--s2)',
+                          color: isActive ? '#ffffff' : 'var(--tx)',
+                          border: isActive ? 'none' : '1px solid var(--ln)',
                           cursor: 'pointer',
                           whiteSpace: 'nowrap',
                           flexShrink: 0,
@@ -696,8 +702,8 @@ SpiderPicks AI Football Engine`;
                         onClick={() => handleSelectAndOpenMatch(m.id)}
                         className="analysis-fixture-card rvs in"
                         style={{
-                          background: '#ffffff',
-                          border: '1px solid #e2e8f0',
+                          background: 'var(--s)',
+                          border: '1px solid var(--ln)',
                           borderRadius: '14px',
                           padding: '14px',
                           cursor: 'pointer',
@@ -713,17 +719,17 @@ SpiderPicks AI Football Engine`;
                               style={{
                                 fontSize: '10px',
                                 fontWeight: 800,
-                                color: isLiveNow ? '#dc2626' : '#0a7d37',
-                                background: isLiveNow ? '#fee2e2' : '#eaf8ee',
+                                color: isLiveNow ? '#dc2626' : 'var(--g)',
+                                background: isLiveNow ? 'rgba(239, 68, 68, 0.12)' : 'rgba(10, 125, 55, 0.1)',
                                 padding: '2px 8px',
                                 borderRadius: '99px',
-                                border: isLiveNow ? '1px solid #fecaca' : '1px solid #a7f3d0',
+                                border: isLiveNow ? '1px solid rgba(239, 68, 68, 0.25)' : '1px solid rgba(10, 125, 55, 0.25)',
                               }}
                             >
                               {isLiveNow ? `● LIVE ${m.m || ''}` : m.t || 'Upcoming'}
                             </span>
 
-                            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                            <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 600 }}>
                               {m.l || 'Football'}
                             </span>
                           </div>
@@ -732,12 +738,12 @@ SpiderPicks AI Football Engine`;
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Crest name={m.h} />
-                              <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
+                              <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--tx)' }}>
                                 {m.h}
                               </span>
                             </div>
                             {m.sh != null && (
-                              <span style={{ fontSize: '15px', fontWeight: 900, color: '#0f172a' }}>{m.sh}</span>
+                              <span style={{ fontSize: '15px', fontWeight: 900, color: 'var(--tx)' }}>{m.sh}</span>
                             )}
                           </div>
 
@@ -745,12 +751,12 @@ SpiderPicks AI Football Engine`;
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Crest name={m.a} />
-                              <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
+                              <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--tx)' }}>
                                 {m.a}
                               </span>
                             </div>
                             {m.sa != null && (
-                              <span style={{ fontSize: '15px', fontWeight: 900, color: '#0f172a' }}>{m.sa}</span>
+                              <span style={{ fontSize: '15px', fontWeight: 900, color: 'var(--tx)' }}>{m.sa}</span>
                             )}
                           </div>
                         </div>
@@ -760,16 +766,16 @@ SpiderPicks AI Football Engine`;
                           style={{
                             marginTop: '14px',
                             paddingTop: '10px',
-                            borderTop: '1px solid #f1f5f9',
+                            borderTop: '1px solid var(--ln)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
                           }}
                         >
-                          <span style={{ fontSize: '11px', color: '#0a7d37', fontWeight: 800 }}>
+                          <span style={{ fontSize: '11px', color: 'var(--g)', fontWeight: 800 }}>
                             {m.tip}
                           </span>
-                          <span style={{ fontSize: '12px', fontWeight: 800, color: '#0a7d37' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--g)' }}>
                             Open Full Analysis &rarr;
                           </span>
                         </div>
@@ -795,12 +801,12 @@ SpiderPicks AI Football Engine`;
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              background: '#ffffff',
+              background: 'var(--s)',
               borderRadius: '14px',
               padding: '12px 18px',
               marginBottom: '16px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+              border: '1px solid var(--ln)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
               gap: '12px',
             }}
           >
@@ -808,24 +814,21 @@ SpiderPicks AI Football Engine`;
               type="button"
               onClick={handleBackToList}
               style={{
-                background: '#0f172a',
-                border: '1px solid #0f172a',
+                background: 'var(--s2)',
+                border: '1px solid var(--ln)',
                 borderRadius: '8px',
                 padding: '9px 18px',
                 fontSize: '13px',
                 fontWeight: 800,
-                color: '#ffffff',
+                color: 'var(--tx)',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.2)',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#1e293b'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#0f172a'; }}
             >
-              <ArrowLeftIcon size={15} color="#ffffff" />
+              <ArrowLeftIcon size={15} color="var(--tx)" />
               <span>Back to Fixtures</span>
             </button>
 
@@ -833,7 +836,7 @@ SpiderPicks AI Football Engine`;
               type="button"
               onClick={handleCopyMasterPrompt}
               style={{
-                background: '#0a7d37',
+                background: 'var(--g)',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '8px',
@@ -847,8 +850,8 @@ SpiderPicks AI Football Engine`;
                 boxShadow: '0 2px 8px rgba(10, 125, 55, 0.25)',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#08632c'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#0a7d37'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
             >
               <CopyIcon size={15} color="#ffffff" />
               <span>Copy AI Prompt</span>
@@ -859,12 +862,12 @@ SpiderPicks AI Football Engine`;
           <div
             className="up1 rvs in"
             style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+              background: 'var(--s)',
               borderRadius: '16px',
               padding: '24px 20px',
               marginBottom: '18px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+              border: '1px solid var(--ln)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
@@ -872,18 +875,18 @@ SpiderPicks AI Football Engine`;
                 style={{
                   fontSize: '11px',
                   fontWeight: 800,
-                  color: '#0a7d37',
-                  background: '#eaf8ee',
+                  color: 'var(--g)',
+                  background: 'rgba(10, 125, 55, 0.1)',
                   padding: '3px 10px',
                   borderRadius: '99px',
-                  border: '1px solid #a7f3d0',
+                  border: '1px solid rgba(10, 125, 55, 0.25)',
                 }}
               >
                 {activeLeague} • {activeDate}
               </span>
 
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <SparklesIcon size={13} color="#0a7d37" />
+              <span style={{ fontSize: '12px', color: 'var(--mu)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <SparklesIcon size={13} color="var(--g)" />
                 <span>{analysisData.source === 'gemini-live-ai' ? 'Live Gemini Analysis' : 'Statistical Poisson Engine'}</span>
               </span>
             </div>
@@ -901,10 +904,10 @@ SpiderPicks AI Football Engine`;
             >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                 <Crest name={activeHome} large />
-                <span style={{ fontSize: 'clamp(15px, 3.2vw, 20px)', fontWeight: 900, color: '#0f172a' }}>
+                <span style={{ fontSize: 'clamp(15px, 3.2vw, 20px)', fontWeight: 900, color: 'var(--tx)' }}>
                   {activeHome}
                 </span>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                   Projected xG: <b>{analysisData.matchAnalysis.expectedGoalsHome.toFixed(2)}</b>
                 </span>
               </div>
@@ -914,25 +917,25 @@ SpiderPicks AI Football Engine`;
                   style={{
                     fontSize: '14px',
                     fontWeight: 900,
-                    color: '#64748b',
-                    background: '#f1f5f9',
+                    color: 'var(--mu)',
+                    background: 'var(--s2)',
                     padding: '4px 14px',
                     borderRadius: '99px',
                   }}
                 >
                   VS
                 </span>
-                <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--mu)', marginTop: '6px' }}>
                   Total xG: <b>{analysisData.matchAnalysis.totalProjectedXG.toFixed(2)}</b>
                 </span>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                 <Crest name={activeAway} large />
-                <span style={{ fontSize: 'clamp(15px, 3.2vw, 20px)', fontWeight: 900, color: '#0f172a' }}>
+                <span style={{ fontSize: 'clamp(15px, 3.2vw, 20px)', fontWeight: 900, color: 'var(--tx)' }}>
                   {activeAway}
                 </span>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                   Projected xG: <b>{analysisData.matchAnalysis.expectedGoalsAway.toFixed(2)}</b>
                 </span>
               </div>
@@ -946,13 +949,13 @@ SpiderPicks AI Football Engine`;
 
               return (
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 800, color: '#475569', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 800, color: 'var(--mu)', marginBottom: '6px' }}>
                     <span>{activeHome} Win ({homeProb}%)</span>
                     <span>Draw ({drawProb}%)</span>
                     <span>{activeAway} Win ({awayProb}%)</span>
                   </div>
-                  <div style={{ display: 'flex', height: '10px', borderRadius: '99px', overflow: 'hidden', background: '#e2e8f0' }}>
-                    <div style={{ width: `${homeProb}%`, background: '#0a7d37' }} title={`${activeHome} Win: ${homeProb}%`} />
+                  <div style={{ display: 'flex', height: '10px', borderRadius: '99px', overflow: 'hidden', background: 'var(--s2)' }}>
+                    <div style={{ width: `${homeProb}%`, background: 'var(--g)' }} title={`${activeHome} Win: ${homeProb}%`} />
                     <div style={{ width: `${drawProb}%`, background: '#94a3b8' }} title={`Draw: ${drawProb}%`} />
                     <div style={{ width: `${awayProb}%`, background: '#0284c7' }} title={`${activeAway} Win: ${awayProb}%`} />
                   </div>
@@ -1145,9 +1148,9 @@ SpiderPicks AI Football Engine`;
                     borderRadius: '99px',
                     fontSize: '13px',
                     fontWeight: isActive ? 800 : 600,
-                    background: isActive ? '#0a7d37' : '#ffffff',
-                    color: isActive ? '#ffffff' : '#334155',
-                    border: isActive ? '1px solid #0a7d37' : '1px solid #e2e8f0',
+                    background: isActive ? 'var(--g)' : 'var(--s)',
+                    color: isActive ? '#ffffff' : 'var(--tx)',
+                    border: isActive ? '1px solid var(--g)' : '1px solid var(--ln)',
                     cursor: 'pointer',
                     boxShadow: isActive ? '0 4px 12px rgba(10, 125, 55, 0.25)' : 'none',
                     transition: 'all 0.15s ease',
@@ -1164,39 +1167,39 @@ SpiderPicks AI Football Engine`;
             <div className="up3 rvs in" style={{ display: 'grid', gap: '14px' }}>
               <div
                 style={{
-                  background: '#ffffff',
+                  background: 'var(--s)',
                   borderRadius: '16px',
                   padding: '20px 18px',
-                  border: '1px solid #e2e8f0',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                  border: '1px solid var(--ln)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
                 }}
               >
-                <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#0f172a', margin: '0 0 10px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, color: 'var(--tx)', margin: '0 0 10px' }}>
                   Tactical Match Summary & Statistical Edge
                 </h3>
-                <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.6, margin: '0 0 16px' }}>
+                <p style={{ fontSize: '13px', color: 'var(--tx)', opacity: 0.9, lineHeight: 1.6, margin: '0 0 16px' }}>
                   {analysisData.finalVerdict.summary}
                 </p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
-                  <div style={{ background: '#f0fdf4', padding: '14px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 800, color: '#0a7d37', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <CheckIcon size={14} color="#0a7d37" />
+                  <div style={{ background: 'rgba(10, 125, 55, 0.08)', padding: '14px', borderRadius: '12px', border: '1px solid rgba(10, 125, 55, 0.25)' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--g)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                      <CheckIcon size={14} color="var(--g)" />
                       <span>STRONGEST LOW-RISK SELECTIONS</span>
                     </span>
-                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#166534', lineHeight: 1.6 }}>
+                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--tx)', lineHeight: 1.6 }}>
                       {analysisData.finalVerdict.strongestPicks.map((pick, i) => (
                         <li key={i}><b>{pick}</b></li>
                       ))}
                     </ul>
                   </div>
 
-                  <div style={{ background: '#fef2f2', padding: '14px', borderRadius: '12px', border: '1px solid #fecaca' }}>
+                  <div style={{ background: 'rgba(239, 68, 68, 0.08)', padding: '14px', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.25)' }}>
                     <span style={{ fontSize: '12px', fontWeight: 800, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                       <AlertIcon size={14} color="#dc2626" />
                       <span>HIGH-RISK MARKETS TO AVOID</span>
                     </span>
-                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#991b1b', lineHeight: 1.6 }}>
+                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--tx)', lineHeight: 1.6 }}>
                       {analysisData.finalVerdict.marketsToAvoid.map((avoid, i) => (
                         <li key={i}>{avoid}</li>
                       ))}
@@ -1212,47 +1215,47 @@ SpiderPicks AI Football Engine`;
             <div
               className="up3 rvs in"
               style={{
-                background: '#ffffff',
+                background: 'var(--s)',
                 borderRadius: '16px',
                 padding: '20px 18px',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                border: '1px solid var(--ln)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
                 overflowX: 'auto',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, color: 'var(--tx)', margin: 0 }}>
                   Full 14-Market Probability Model
                 </h3>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                   Poisson & Dixon-Coles calculations
                 </span>
               </div>
 
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                 <thead>
-                  <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                    <th style={{ padding: '10px 12px', color: '#475569', fontWeight: 800 }}>Market</th>
-                    <th style={{ padding: '10px 12px', color: '#475569', fontWeight: 800 }}>Selection & Line</th>
-                    <th style={{ padding: '10px 12px', color: '#475569', fontWeight: 800 }}>Probability</th>
-                    <th style={{ padding: '10px 12px', color: '#475569', fontWeight: 800 }}>Confidence</th>
-                    <th style={{ padding: '10px 12px', color: '#475569', fontWeight: 800 }}>Statistical Rationale</th>
+                  <tr style={{ background: 'var(--s2)', borderBottom: '2px solid var(--ln)', textAlign: 'left' }}>
+                    <th style={{ padding: '10px 12px', color: 'var(--tx)', fontWeight: 800 }}>Market</th>
+                    <th style={{ padding: '10px 12px', color: 'var(--tx)', fontWeight: 800 }}>Selection & Line</th>
+                    <th style={{ padding: '10px 12px', color: 'var(--tx)', fontWeight: 800 }}>Probability</th>
+                    <th style={{ padding: '10px 12px', color: 'var(--tx)', fontWeight: 800 }}>Confidence</th>
+                    <th style={{ padding: '10px 12px', color: 'var(--tx)', fontWeight: 800 }}>Statistical Rationale</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analysisData.predictionTable.map((item, idx) => {
-                    const confColor = item.confidence === 'High' ? '#0a7d37' : item.confidence === 'Medium' ? '#d97706' : '#dc2626';
-                    const confBg = item.confidence === 'High' ? '#eaf8ee' : item.confidence === 'Medium' ? '#fef3c7' : '#fee2e2';
+                    const confColor = item.confidence === 'High' ? 'var(--g)' : item.confidence === 'Medium' ? '#d97706' : '#dc2626';
+                    const confBg = item.confidence === 'High' ? 'rgba(10, 125, 55, 0.12)' : item.confidence === 'Medium' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(239, 68, 68, 0.12)';
 
                     return (
-                      <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '10px 12px', fontWeight: 700, color: '#0f172a' }}>
+                      <tr key={idx} style={{ borderBottom: '1px solid var(--ln)' }}>
+                        <td style={{ padding: '10px 12px', fontWeight: 700, color: 'var(--tx)' }}>
                           {item.market}
                         </td>
-                        <td style={{ padding: '10px 12px', color: '#0a7d37', fontWeight: 800 }}>
+                        <td style={{ padding: '10px 12px', color: 'var(--g)', fontWeight: 800 }}>
                           {item.selection} {item.line ? `(${item.line})` : ''}
                         </td>
-                        <td style={{ padding: '10px 12px', fontWeight: 800, color: '#0f172a' }}>
+                        <td style={{ padding: '10px 12px', fontWeight: 800, color: 'var(--tx)' }}>
                           {item.estimatedProbability}%
                         </td>
                         <td style={{ padding: '10px 12px' }}>
@@ -1269,7 +1272,7 @@ SpiderPicks AI Football Engine`;
                             {item.confidence}
                           </span>
                         </td>
-                        <td style={{ padding: '10px 12px', color: '#475569', fontSize: '12px', maxWidth: '340px' }}>
+                        <td style={{ padding: '10px 12px', color: 'var(--mu)', fontSize: '12px', maxWidth: '340px' }}>
                           {item.supportingEvidence}
                         </td>
                       </tr>
@@ -1285,18 +1288,18 @@ SpiderPicks AI Football Engine`;
             <div
               className="up3 rvs in"
               style={{
-                background: '#ffffff',
+                background: 'var(--s)',
                 borderRadius: '16px',
                 padding: '20px 18px',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                border: '1px solid var(--ln)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
               }}
             >
               <div style={{ marginBottom: '14px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, color: 'var(--tx)', margin: '0 0 4px' }}>
                   Poisson Distribution Correct Scorelines
                 </h3>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                   Broad spectrum modeling covering low, medium, and high scoring scenarios
                 </span>
               </div>
@@ -1306,8 +1309,8 @@ SpiderPicks AI Football Engine`;
                   <div
                     key={i}
                     style={{
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: 'var(--s2)',
+                      border: '1px solid var(--ln)',
                       borderRadius: '12px',
                       padding: '12px 16px',
                       display: 'flex',
@@ -1317,22 +1320,22 @@ SpiderPicks AI Football Engine`;
                     }}
                   >
                     <div>
-                      <span style={{ fontSize: '11px', fontWeight: 800, color: '#0a7d37', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--g)', textTransform: 'uppercase' }}>
                         {sc.label}
                       </span>
-                      <div style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a', margin: '2px 0' }}>
+                      <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--tx)', margin: '2px 0' }}>
                         {sc.score}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--mu)' }}>
                         {sc.rationale}
                       </div>
                     </div>
 
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '18px', fontWeight: 900, color: '#0a7d37' }}>
+                      <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--g)' }}>
                         {sc.probability.toFixed(1)}%
                       </div>
-                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>Poisson Probability</span>
+                      <span style={{ fontSize: '11px', color: 'var(--mu)' }}>Poisson Probability</span>
                     </div>
                   </div>
                 ))}
@@ -1345,53 +1348,53 @@ SpiderPicks AI Football Engine`;
             <div
               className="up3 rvs in"
               style={{
-                background: '#ffffff',
+                background: 'var(--s)',
                 borderRadius: '16px',
                 padding: '20px 18px',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                border: '1px solid var(--ln)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
               }}
             >
               <div style={{ marginBottom: '14px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, color: 'var(--tx)', margin: '0 0 4px' }}>
                   Corner Statistics & Probability Projections
                 </h3>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                   Independent corner modeling calculated separately from match goals
                 </span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '16px' }}>
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 700 }}>{activeHome} Avg Corners</span>
-                  <div style={{ fontSize: '20px', fontWeight: 900, color: '#0a7d37', marginTop: '4px' }}>
+                <div style={{ background: 'var(--s2)', padding: '14px', borderRadius: '12px', border: '1px solid var(--ln)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 700 }}>{activeHome} Avg Corners</span>
+                  <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--g)', marginTop: '4px' }}>
                     {analysisData.cornerStatistics.homeAvgCornersWon.toFixed(1)}
                   </div>
                 </div>
 
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 700 }}>Projected Total Corners</span>
-                  <div style={{ fontSize: '20px', fontWeight: 900, color: '#0a7d37', marginTop: '4px' }}>
+                <div style={{ background: 'var(--s2)', padding: '14px', borderRadius: '12px', border: '1px solid var(--ln)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 700 }}>Projected Total Corners</span>
+                  <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--g)', marginTop: '4px' }}>
                     {analysisData.cornerStatistics.projectedTotalCorners.toFixed(1)}
                   </div>
                 </div>
 
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 700 }}>{activeAway} Avg Corners</span>
-                  <div style={{ fontSize: '20px', fontWeight: 900, color: '#0a7d37', marginTop: '4px' }}>
+                <div style={{ background: 'var(--s2)', padding: '14px', borderRadius: '12px', border: '1px solid var(--ln)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--mu)', fontWeight: 700 }}>{activeAway} Avg Corners</span>
+                  <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--g)', marginTop: '4px' }}>
                     {analysisData.cornerStatistics.awayAvgCornersWon.toFixed(1)}
                   </div>
                 </div>
               </div>
 
-              <div style={{ background: '#f0fdf4', padding: '14px 16px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#0a7d37', textTransform: 'uppercase' }}>
+              <div style={{ background: 'rgba(10, 125, 55, 0.08)', padding: '14px 16px', borderRadius: '12px', border: '1px solid rgba(10, 125, 55, 0.25)' }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--g)', textTransform: 'uppercase' }}>
                   RECOMMENDED STATISTICAL LINE
                 </span>
-                <div style={{ fontSize: '17px', fontWeight: 900, color: '#064e23', margin: '4px 0' }}>
+                <div style={{ fontSize: '17px', fontWeight: 900, color: 'var(--g)', margin: '4px 0' }}>
                   {analysisData.cornerStatistics.recommendedLine}
                 </div>
-                <div style={{ fontSize: '12px', color: '#166534', lineHeight: 1.5 }}>
+                <div style={{ fontSize: '12px', color: 'var(--tx)', lineHeight: 1.5 }}>
                   {analysisData.cornerStatistics.rationale}
                 </div>
               </div>
@@ -1403,46 +1406,46 @@ SpiderPicks AI Football Engine`;
             <div
               className="up3 rvs in"
               style={{
-                background: '#ffffff',
+                background: 'var(--s)',
                 borderRadius: '16px',
                 padding: '20px 18px',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                border: '1px solid var(--ln)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
               }}
             >
               <div style={{ marginBottom: '14px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, color: 'var(--tx)', margin: '0 0 4px' }}>
                   Tactical & Squad Intelligence
                 </h3>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
                   Formations, resting schedules, fatigue, and injury reports
                 </span>
               </div>
 
               <div style={{ display: 'grid', gap: '12px' }}>
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <b style={{ fontSize: '13px', color: '#0f172a', display: 'block', marginBottom: '4px' }}>
+                <div style={{ background: 'var(--s2)', padding: '14px', borderRadius: '12px', border: '1px solid var(--ln)' }}>
+                  <b style={{ fontSize: '13px', color: 'var(--tx)', display: 'block', marginBottom: '4px' }}>
                     Tactical Breakdown & Game Scenario:
                   </b>
-                  <p style={{ fontSize: '12px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                  <p style={{ fontSize: '12px', color: 'var(--mu)', lineHeight: 1.6, margin: 0 }}>
                     {analysisData.matchAnalysis.tacticalBreakdown}
                   </p>
                 </div>
 
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <b style={{ fontSize: '13px', color: '#0f172a', display: 'block', marginBottom: '4px' }}>
+                <div style={{ background: 'var(--s2)', padding: '14px', borderRadius: '12px', border: '1px solid var(--ln)' }}>
+                  <b style={{ fontSize: '13px', color: 'var(--tx)', display: 'block', marginBottom: '4px' }}>
                     Rest Days & Squad Fatigue:
                   </b>
-                  <p style={{ fontSize: '12px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                  <p style={{ fontSize: '12px', color: 'var(--mu)', lineHeight: 1.6, margin: 0 }}>
                     {analysisData.teamNews.fatigueMoraleRest}
                   </p>
                 </div>
 
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <b style={{ fontSize: '13px', color: '#0f172a', display: 'block', marginBottom: '4px' }}>
+                <div style={{ background: 'var(--s2)', padding: '14px', borderRadius: '12px', border: '1px solid var(--ln)' }}>
+                  <b style={{ fontSize: '13px', color: 'var(--tx)', display: 'block', marginBottom: '4px' }}>
                     Key Absences & Doubts:
                   </b>
-                  <div style={{ fontSize: '12px', color: '#475569', lineHeight: 1.6, marginTop: '4px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--mu)', lineHeight: 1.6, marginTop: '4px' }}>
                     <div><b>{activeHome}:</b> {analysisData.teamNews.homeInjuriesAndDoubts.join(', ') || 'No major confirmed absences'}</div>
                     <div><b>{activeAway}:</b> {analysisData.teamNews.awayInjuriesAndDoubts.join(', ') || 'Squad close to full fitness'}</div>
                   </div>
@@ -1462,31 +1465,28 @@ SpiderPicks AI Football Engine`;
               gap: '12px',
               marginTop: '24px',
               paddingTop: '18px',
-              borderTop: '1px solid #e2e8f0',
+              borderTop: '1px solid var(--ln)',
             }}
           >
             <button
               type="button"
               onClick={handleBackToList}
               style={{
-                background: '#0f172a',
-                border: '1px solid #0f172a',
+                background: 'var(--s2)',
+                border: '1px solid var(--ln)',
                 borderRadius: '8px',
                 padding: '10px 20px',
                 fontSize: '13px',
                 fontWeight: 800,
-                color: '#ffffff',
+                color: 'var(--tx)',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.2)',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#1e293b'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#0f172a'; }}
             >
-              <ArrowLeftIcon size={15} color="#ffffff" />
+              <ArrowLeftIcon size={15} color="var(--tx)" />
               <span>Back to Fixtures List</span>
             </button>
 
@@ -1494,7 +1494,7 @@ SpiderPicks AI Football Engine`;
               type="button"
               onClick={handleCopyBankerPredictions}
               style={{
-                background: '#0a7d37',
+                background: 'var(--g)',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '8px',
@@ -1508,8 +1508,6 @@ SpiderPicks AI Football Engine`;
                 boxShadow: '0 4px 12px rgba(10, 125, 55, 0.25)',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#08632c'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#0a7d37'; }}
             >
               <CopyIcon size={15} color="#ffffff" />
               <span>Copy Banker Predictions</span>
@@ -1517,7 +1515,7 @@ SpiderPicks AI Football Engine`;
           </div>
 
           {/* Disclaimer */}
-          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '11px', color: '#94a3b8' }}>
+          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '11px', color: 'var(--mu)' }}>
             {analysisData.disclaimer}
           </div>
         </div>
@@ -1542,12 +1540,13 @@ SpiderPicks AI Football Engine`;
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: '#ffffff',
+              background: 'var(--s)',
+              border: '1px solid var(--ln)',
               borderRadius: '20px',
               padding: '28px 24px',
               maxWidth: '440px',
               width: '100%',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.25)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.35)',
               textAlign: 'center',
             }}
           >
@@ -1567,10 +1566,10 @@ SpiderPicks AI Football Engine`;
               <AlertIcon size={28} color="#dc2626" />
             </div>
 
-            <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 900, color: 'var(--tx)', margin: '0 0 8px' }}>
               Daily AI Limit Reached (5/5)
             </h3>
-            <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.5, margin: '0 0 20px' }}>
+            <p style={{ fontSize: '13px', color: 'var(--mu)', lineHeight: 1.5, margin: '0 0 20px' }}>
               Free member accounts can analyze up to <b>5 games per day</b> with the AI Prediction Engine. Upgrade to <b>SpiderPicks VIP</b> for unlimited analyses on matches worldwide!
             </p>
 
@@ -1582,7 +1581,7 @@ SpiderPicks AI Football Engine`;
                   if (onOpenMembership) onOpenMembership();
                 }}
                 style={{
-                  background: 'linear-gradient(135deg, #0a7d37 0%, #059669 100%)',
+                  background: 'linear-gradient(135deg, var(--g) 0%, var(--g2) 100%)',
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: '12px',
@@ -1600,12 +1599,12 @@ SpiderPicks AI Football Engine`;
                 onClick={() => setQuotaModalOpen(false)}
                 style={{
                   background: 'transparent',
-                  border: '1px solid #cbd5e1',
+                  border: '1px solid var(--ln)',
                   borderRadius: '12px',
                   padding: '10px',
                   fontSize: '13px',
                   fontWeight: 700,
-                  color: '#64748b',
+                  color: 'var(--mu)',
                   cursor: 'pointer',
                 }}
               >

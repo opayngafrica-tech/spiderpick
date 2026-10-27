@@ -162,17 +162,14 @@ export default function App() {
   }, []);
 
   // Matches State (Synced with Supabase picks backend, empty if no games)
-  const [matches, setMatches] = useState<MatchItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('sa_matches');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [matches, setMatches] = useState<MatchItem[]>([]);
 
   // Fetch published picks from Supabase picks table + Realtime updates
   useEffect(() => {
+    try {
+      localStorage.removeItem('sa_matches');
+    } catch {}
+
     async function loadPicksFromDb() {
       try {
         const { data, error } = await supabase
@@ -199,10 +196,12 @@ export default function App() {
             selections: item.selections,
           }));
           setMatches(mapped);
-          localStorage.setItem('sa_matches', JSON.stringify(mapped));
+        } else {
+          setMatches([]);
         }
       } catch (err) {
         console.warn('Supabase picks query note:', err);
+        setMatches([]);
       }
     }
 
@@ -341,6 +340,7 @@ export default function App() {
   useEffect(() => {
     // Purge any legacy cached mock posts
     try {
+      localStorage.removeItem('sa_posts');
       localStorage.removeItem('sa_posts2');
     } catch {}
 
@@ -389,14 +389,70 @@ export default function App() {
       .channel('realtime_feed')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'feed_posts' },
-        () => {
-          loadSupabaseFeed();
+        { event: 'INSERT', schema: 'public', table: 'feed_posts' },
+        (payload) => {
+          const item = payload.new;
+          if (item) {
+            const mapped: PostItem = {
+              id: Number(item.id),
+              n: item.user_name || 'Community Tipper',
+              txt: item.caption || item.text || '',
+              img: item.img || undefined,
+              imgs: Array.isArray(item.imgs) ? item.imgs : (item.img ? [item.img] : []),
+              code: item.booking_code || undefined,
+              bk: item.bookmaker || 'SportyBet',
+              t: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
+              lk: Number(item.likes_count || 0),
+              liked: false,
+              cm: Array.isArray(item.comments) ? item.comments : [],
+            };
+            setPosts((prev) => {
+              if (prev.some((p) => p.id === mapped.id)) return prev;
+              return [mapped, ...prev];
+            });
+          }
         }
       )
-      .subscribe();
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'feed_posts' },
+        (payload) => {
+          const item = payload.new;
+          if (item) {
+            setPosts((prev) =>
+              prev.map((p) =>
+                p.id === Number(item.id)
+                  ? {
+                      ...p,
+                      lk: Number(item.likes_count ?? p.lk),
+                      cm: Array.isArray(item.comments) ? item.comments : p.cm,
+                    }
+                  : p
+              )
+            );
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'feed_posts' },
+        (payload) => {
+          if (payload.old?.id) {
+            setPosts((prev) => prev.filter((p) => p.id !== Number(payload.old.id)));
+          }
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          loadSupabaseFeed();
+        }
+      });
+
+    // Background interval poll (every 20s) ensures data is fresh across all devices
+    const pollInterval = setInterval(loadSupabaseFeed, 20000);
 
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, []);
@@ -606,20 +662,31 @@ export default function App() {
     }
   };
 
-  const handleLikePost = (postId: number) => {
+  const handleLikePost = async (postId: number) => {
+    let nextCount = 0;
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id === postId) {
           const liked = !p.liked;
+          nextCount = Math.max(0, p.lk + (liked ? 1 : -1));
           return {
             ...p,
             liked,
-            lk: p.lk + (liked ? 1 : -1),
+            lk: nextCount,
           };
         }
         return p;
       })
     );
+
+    try {
+      await supabase
+        .from('feed_posts')
+        .update({ likes_count: nextCount })
+        .eq('id', postId);
+    } catch (err) {
+      console.warn('Like sync note:', err);
+    }
   };
 
   const handleAddComment = async (postId: number, commentText: string) => {
@@ -697,6 +764,7 @@ export default function App() {
           onNavigateApp={(targetRoute) => navigateTo(targetRoute)}
           onOpenLegal={openLegal}
           onOpenMenu={handleOpenMenu}
+          matches={matches}
         />
         <SideMenu
           isOpen={sideMenuOpen}
