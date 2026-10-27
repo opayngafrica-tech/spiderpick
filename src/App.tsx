@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './utils/supabase';
 import { MatchItem, LiveMatchItem, PostItem, NotificationItem } from './types/football';
+import { NT, INITIAL_POSTS } from './lib/saviourData';
 import { LandingPage } from './components/saviour/LandingPage';
 import { AuthPage } from './components/saviour/AuthPage';
 import { FeedPage } from './components/saviour/FeedPage';
