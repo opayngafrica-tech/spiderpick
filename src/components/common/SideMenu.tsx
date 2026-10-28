@@ -110,8 +110,8 @@ export const SideMenu: React.FC<SideMenuProps> = ({
               alt="SpiderPicks Logo"
               style={{ width: '30px', height: '30px', objectFit: 'contain' }}
             />
-            <span style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
-              Spider<span style={{ color: '#0a7d37' }}>Picks</span>
+            <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--tx)', letterSpacing: '-0.3px' }}>
+              Spider<span style={{ color: 'var(--g, #0a7d37)' }}>Picks</span>
             </span>
           </div>
           <button
@@ -131,8 +131,8 @@ export const SideMenu: React.FC<SideMenuProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Crest name={user.n} />
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a' }}>{user.n}</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>{user.e}</div>
+                  <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--tx)' }}>{user.n}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--mu)' }}>{user.e}</div>
                 </div>
               </div>
               <button
@@ -141,7 +141,7 @@ export const SideMenu: React.FC<SideMenuProps> = ({
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: '#dc2626',
+                  color: '#ef4444',
                   fontSize: '12px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -153,7 +153,7 @@ export const SideMenu: React.FC<SideMenuProps> = ({
             </div>
           ) : (
             <div>
-              <div style={{ fontSize: '12px', color: '#475569', marginBottom: '10px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '12px', color: 'var(--mu)', marginBottom: '10px', lineHeight: 1.4, fontWeight: 500 }}>
                 Access verified picks, live score tracker, and community slips.
               </div>
               <button

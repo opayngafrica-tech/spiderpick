@@ -40,7 +40,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     setErrorMsg('');
     setForgotMsg('');
 
-    const em = email.trim();
+    const em = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(em)) {
       setErrorMsg('Enter a valid email.');
       return;
@@ -103,7 +103,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         });
 
         if (error) {
-          setErrorMsg(error.message);
+          // If credentials failed, clear any stale session tokens that may cause a false rejection
+          try {
+            Object.keys(localStorage).forEach((key) => {
+              if (key.startsWith('sb-')) localStorage.removeItem(key);
+            });
+          } catch {}
+
+          if (error.message.toLowerCase().includes('invalid login credentials')) {
+            setErrorMsg('Invalid email or password. Please verify your credentials or click "Sign up" if you have not created an account.');
+          } else {
+            setErrorMsg(error.message);
+          }
           setLoading(false);
           return;
         }

@@ -416,11 +416,32 @@ export const FeedPage: React.FC<FeedPageProps> = ({
                 {/* Like Button: requires sign in if guest */}
                 <div className="ac">
                   <button
-                    className={p.liked ? 'lkd' : ''}
+                    className={`like-btn ${p.liked ? 'lkd active-liked' : ''}`}
                     onClick={() => handleLikeClick(p.id)}
+                    style={
+                      p.liked
+                        ? {
+                            color: '#ef4444',
+                            fontWeight: 800,
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            borderColor: 'rgba(239, 68, 68, 0.3)',
+                          }
+                        : {}
+                    }
+                    title={p.liked ? 'You liked this post' : 'Like this post'}
                   >
-                    <Ico path={I.t} />
-                    Like
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        color: p.liked ? '#ef4444' : 'inherit',
+                        transform: p.liked ? 'scale(1.15)' : 'scale(1)',
+                        transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                      }}
+                    >
+                      <Ico path={I.t} />
+                    </span>
+                    <span>{p.liked ? 'Liked' : 'Like'}</span>
                   </button>
                   <button onClick={() => toggleComments(p.id)}>
                     <Ico path={I.c} />

@@ -2410,10 +2410,41 @@ td:not(:first-child), th:not(:first-child) {
   left: 0;
   right: 0;
   z-index: 100;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--s, #ffffff);
+  border-bottom: 1px solid var(--ln, rgba(0, 0, 0, 0.08));
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   transition: all 0.25s ease;
+}
+
+[data-theme="dark"] .ln-separated,
+:root[data-theme="dark"] .ln-separated {
+  background: var(--s, #131a15) !important;
+  border-bottom: 1px solid var(--ln, #202c24) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .navbar-brand-title,
+:root[data-theme="dark"] .navbar-brand-title {
+  color: var(--tx, #f1f5f2) !important;
+}
+
+[data-theme="dark"] .ln-separated .lk2 a,
+:root[data-theme="dark"] .ln-separated .lk2 a {
+  color: var(--mu, #8b9a90) !important;
+}
+
+[data-theme="dark"] .ln-separated .lk2 a:hover,
+:root[data-theme="dark"] .ln-separated .lk2 a:hover,
+[data-theme="dark"] .ln-separated .lk2 a.active,
+:root[data-theme="dark"] .ln-separated .lk2 a.active {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ln-separated .mb.mobile-menu-btn,
+:root[data-theme="dark"] .ln-separated .mb.mobile-menu-btn {
+  background: var(--s2, #1b251e) !important;
+  border-color: var(--ln, #202c24) !important;
+  color: var(--tx, #f1f5f2) !important;
 }
 
 .ln-inner {
@@ -2747,15 +2778,23 @@ td:not(:first-child), th:not(:first-child) {
   width: 86vw;
   max-width: 340px;
   height: 100%;
-  background: #ffffff !important;
-  border-right: 1px solid #e2e8f0;
+  background: var(--s, #ffffff);
+  border-right: 1px solid var(--ln, #e2e8f0);
   box-shadow: 12px 0 40px rgba(0, 0, 0, 0.18);
   padding: calc(18px + env(safe-area-inset-top, 0px)) 18px calc(24px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  color: #0f172a;
+  color: var(--tx, #0f172a);
+}
+
+[data-theme="dark"] .mobile-menu-drawer,
+:root[data-theme="dark"] .mobile-menu-drawer {
+  background: var(--s, #131a15) !important;
+  border-right: 1px solid var(--ln, #202c24) !important;
+  color: var(--tx, #f1f5f2) !important;
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6) !important;
 }
 
 .mobile-menu-header {
@@ -2764,16 +2803,21 @@ td:not(:first-child), th:not(:first-child) {
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--ln, #e2e8f0);
+}
+
+[data-theme="dark"] .mobile-menu-header,
+:root[data-theme="dark"] .mobile-menu-header {
+  border-bottom: 1px solid var(--ln, #202c24) !important;
 }
 
 .mobile-menu-close {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #f1f5f9;
-  color: #334155;
-  border: 1px solid #cbd5e1;
+  background: var(--s2, #f1f5f9);
+  color: var(--tx, #334155);
+  border: 1px solid var(--ln, #cbd5e1);
   font-size: 14px;
   font-weight: 700;
   display: grid;
@@ -2783,18 +2827,31 @@ td:not(:first-child), th:not(:first-child) {
 }
 
 .mobile-menu-close:hover {
-  background: #e2e8f0;
-  color: #0a7d37;
-  border-color: #94a3b8;
+  background: var(--s, #e2e8f0);
+  color: var(--g, #0a7d37);
+  border-color: var(--g, #94a3b8);
 }
 
-/* Auth card inside side menu - Clean light theme matching white drawer */
+[data-theme="dark"] .mobile-menu-close,
+:root[data-theme="dark"] .mobile-menu-close {
+  background: var(--s2, #1b251e) !important;
+  color: var(--tx, #f1f5f2) !important;
+  border-color: var(--ln, #202c24) !important;
+}
+
+/* Auth card inside side menu */
 .side-menu-auth-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--s2, #f8fafc);
+  border: 1px solid var(--ln, #e2e8f0);
   border-radius: 14px;
   padding: 14px;
   margin-bottom: 20px;
+}
+
+[data-theme="dark"] .side-menu-auth-card,
+:root[data-theme="dark"] .side-menu-auth-card {
+  background: var(--s2, #1b251e) !important;
+  border: 1px solid var(--ln, #202c24) !important;
 }
 
 .side-menu-primary-btn {
@@ -2823,10 +2880,15 @@ td:not(:first-child), th:not(:first-child) {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.8px;
-  color: #64748b;
+  color: var(--mu, #64748b);
   margin-bottom: 10px;
   text-transform: uppercase;
   padding: 0 4px;
+}
+
+[data-theme="dark"] .side-menu-section-title,
+:root[data-theme="dark"] .side-menu-section-title {
+  color: var(--mu, #8b9a90) !important;
 }
 
 .side-menu-list {
@@ -2845,7 +2907,7 @@ td:not(:first-child), th:not(:first-child) {
   border-radius: 12px;
   background: transparent;
   border: 1px solid transparent;
-  color: #1e293b;
+  color: var(--tx, #1e293b);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -2856,9 +2918,25 @@ td:not(:first-child), th:not(:first-child) {
 }
 
 .side-menu-item:hover {
-  background: #f1f5f9;
-  border-color: #e2e8f0;
-  color: #0a7d37;
+  background: var(--s2, #f1f5f9);
+}
+
+[data-theme="dark"] .side-menu-item,
+:root[data-theme="dark"] .side-menu-item {
+  color: var(--tx, #f1f5f2) !important;
+}
+
+[data-theme="dark"] .side-menu-item:hover,
+:root[data-theme="dark"] .side-menu-item:hover {
+  background: var(--s2, #1b251e) !important;
+  color: var(--g, #13a34d) !important;
+}
+
+[data-theme="dark"] .side-menu-item.active,
+:root[data-theme="dark"] .side-menu-item.active {
+  background: rgba(19, 163, 77, 0.15) !important;
+  color: var(--g, #13a34d) !important;
+  border-color: rgba(19, 163, 77, 0.3) !important;
 }
 
 .side-menu-item.active {
@@ -2874,7 +2952,12 @@ td:not(:first-child), th:not(:first-child) {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  color: #475569;
+  color: var(--mu, #475569);
+}
+
+[data-theme="dark"] .side-menu-item-icon,
+:root[data-theme="dark"] .side-menu-item-icon {
+  color: var(--mu, #8b9a90) !important;
 }
 
 .side-menu-item:hover .side-menu-item-icon,
@@ -3614,6 +3697,21 @@ td:not(:first-child), th:not(:first-child) {
   .watermark-shimmer-bar {
     animation: none !important;
   }
+}
+
+/* Post Like Button Active State */
+.ac button.lkd,
+.ac button.active-liked {
+  color: #ef4444 !important;
+  font-weight: 800 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.ac button.lkd svg,
+.ac button.active-liked svg {
+  color: #ef4444 !important;
+  fill: #ef4444 !important;
 }
 
 

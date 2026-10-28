@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './utils/supabase';
 import { MatchItem, LiveMatchItem, PostItem, NotificationItem } from './types/football';
-import { NT } from './lib/saviourData';
+import { NT, M } from './lib/saviourData';
 import { LandingPage } from './components/saviour/LandingPage';
 import { AuthPage } from './components/saviour/AuthPage';
 import { FeedPage } from './components/saviour/FeedPage';
@@ -47,8 +47,11 @@ export default function App() {
   });
 
   useEffect(() => {
-    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-    localStorage.setItem('sa_theme', isDark ? 'dark' : 'light');
+    const themeName = isDark ? 'dark' : 'light';
+    document.documentElement.dataset.theme = themeName;
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('light', !isDark);
+    localStorage.setItem('sa_theme', themeName);
   }, [isDark]);
 
   const toggleTheme = () => {
@@ -158,9 +161,12 @@ export default function App() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         syncSession(session.user);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        localStorage.removeItem('sa_user');
       }
     });
 
@@ -185,7 +191,7 @@ export default function App() {
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!error && Array.isArray(data)) {
+        if (!error && Array.isArray(data) && data.length > 0) {
           const mapped: MatchItem[] = data.map((item: any) => ({
             id: Number(item.id),
             h: item.home_team,
@@ -205,11 +211,11 @@ export default function App() {
           }));
           setMatches(mapped);
         } else {
-          setMatches([]);
+          setMatches(M);
         }
       } catch (err) {
         console.warn('Supabase picks query note:', err);
-        setMatches([]);
+        setMatches(M);
       }
     }
 
@@ -734,8 +740,14 @@ export default function App() {
     try {
       await supabase.auth.signOut();
     } catch (err) {}
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('sb-') || key.startsWith('sa_user')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch {}
     setUser(null);
-    localStorage.removeItem('sa_user');
     goToLanding();
   };
 
