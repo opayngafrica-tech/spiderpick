@@ -48,6 +48,42 @@ export const FeedPage: React.FC<FeedPageProps> = ({
   const [drafts, setDrafts] = useState<string[]>([]);
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
 
+  // Lightbox Preview State for full post image viewing
+  const [lightbox, setLightbox] = useState<{
+    images: string[];
+    currentIndex: number;
+  } | null>(null);
+
+  // Keyboard navigation & body scroll lock for Lightbox
+  React.useEffect(() => {
+    if (!lightbox) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLightbox(null);
+      } else if (e.key === 'ArrowRight') {
+        setLightbox((prev) =>
+          prev ? { ...prev, currentIndex: (prev.currentIndex + 1) % prev.images.length } : null
+        );
+      } else if (e.key === 'ArrowLeft') {
+        setLightbox((prev) =>
+          prev
+            ? { ...prev, currentIndex: (prev.currentIndex - 1 + prev.images.length) % prev.images.length }
+            : null
+        );
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [lightbox]);
+
   // Real-time post feed
   const allPosts = posts;
 
@@ -168,16 +204,25 @@ export const FeedPage: React.FC<FeedPageProps> = ({
     setCommentInputs({ ...commentInputs, [postId]: '' });
   };
 
-  const renderGrid = (imgs?: string[]) => {
-    if (!imgs || !imgs.length) return null;
-    const n = imgs.length;
+  const renderGrid = (imgs?: string[], fallbackImg?: string) => {
+    const list = imgs && imgs.length > 0 ? imgs : (fallbackImg ? [fallbackImg] : []);
+    if (!list.length) return null;
+    const n = list.length;
     const extra = n - 5;
     const gridClass = `gr g${Math.min(n, 5)}`;
 
     return (
       <div className={gridClass}>
-        {imgs.slice(0, 5).map((src, i) => (
-          <div key={i} style={{ position: 'relative' }}>
+        {list.slice(0, 5).map((src, i) => (
+          <div
+            key={i}
+            style={{ position: 'relative', cursor: 'zoom-in' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightbox({ images: list, currentIndex: i });
+            }}
+            title="Click to view full preview"
+          >
             <WatermarkImage src={src} alt="SpiderPicks Match Screenshot" />
             {i === 4 && extra > 0 && <b className="mo">+{extra}</b>}
           </div>
@@ -332,7 +377,7 @@ export const FeedPage: React.FC<FeedPageProps> = ({
 
                 {p.txt && <p>{p.txt}</p>}
 
-                {renderGrid(p.imgs)}
+                {renderGrid(p.imgs, p.img)}
 
                 {p.code && (
                   <div className="cd">
@@ -628,6 +673,202 @@ export const FeedPage: React.FC<FeedPageProps> = ({
             <button className="go2" onClick={handleCreatePost}>
               Post
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Full Image Preview Lightbox Modal */}
+      {lightbox && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image Preview"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            backgroundColor: 'rgba(0, 0, 0, 0.94)',
+            backdropFilter: 'blur(12px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            animation: 'fadeIn 0.2s ease-out',
+          }}
+          onClick={() => setLightbox(null)}
+        >
+          {/* Top Bar with Counter and Close Button */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 16,
+              left: 20,
+              right: 20,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              zIndex: 100000,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                color: '#fff',
+                fontSize: '13px',
+                fontWeight: 700,
+                letterSpacing: '0.5px',
+                background: 'rgba(255, 255, 255, 0.12)',
+                padding: '6px 14px',
+                borderRadius: '99px',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              {lightbox.images.length > 1
+                ? `${lightbox.currentIndex + 1} / ${lightbox.images.length}`
+                : 'Image Preview'}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setLightbox(null)}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.18)',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'background 0.2s ease, transform 0.15s ease',
+              }}
+              title="Close (Esc)"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Previous Arrow */}
+          {lightbox.images.length > 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightbox((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        currentIndex:
+                          (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
+                      }
+                    : null
+                );
+              }}
+              style={{
+                position: 'absolute',
+                left: 20,
+                width: '46px',
+                height: '46px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.18)',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                fontSize: '26px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 100000,
+                transition: 'background 0.2s',
+              }}
+              aria-label="Previous Image"
+            >
+              ‹
+            </button>
+          )}
+
+          {/* Full Image Container */}
+          <div
+            style={{
+              maxWidth: '92vw',
+              maxHeight: '85vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={lightbox.images[lightbox.currentIndex]}
+              alt="Full Preview"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '85vh',
+                objectFit: 'contain',
+                borderRadius: '12px',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.85)',
+              }}
+            />
+          </div>
+
+          {/* Next Arrow */}
+          {lightbox.images.length > 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightbox((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        currentIndex: (prev.currentIndex + 1) % prev.images.length,
+                      }
+                    : null
+                );
+              }}
+              style={{
+                position: 'absolute',
+                right: 20,
+                width: '46px',
+                height: '46px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.18)',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                fontSize: '26px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 100000,
+                transition: 'background 0.2s',
+              }}
+              aria-label="Next Image"
+            >
+              ›
+            </button>
+          )}
+
+          {/* Bottom Caption / Hint */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 18,
+              color: 'rgba(255, 255, 255, 0.75)',
+              fontSize: '12px',
+              fontWeight: 500,
+              textAlign: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            Click outside or press <kbd style={{ padding: '2px 6px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }}>ESC</kbd> to close
           </div>
         </div>
       )}
