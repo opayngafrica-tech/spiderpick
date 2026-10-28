@@ -41,8 +41,9 @@ export const LivePage: React.FC<LivePageProps> = ({
         const res = await fetch('/api/football/live');
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setLiveItems(data);
+          const list = Array.isArray(data) ? data : Array.isArray(data?.matches) ? data.matches : [];
+          if (list.length > 0) {
+            setLiveItems(list);
           }
         }
       } catch (err) {

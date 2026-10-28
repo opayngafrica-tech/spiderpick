@@ -71,6 +71,12 @@ export const SideMenu: React.FC<SideMenuProps> = ({
       active: !isLandingPage && currentRoute === 'membership',
       onClick: () => handleNav(() => onNavigateApp('membership')),
     },
+    {
+      label: 'Community & Socials',
+      icon: I.s,
+      active: !isLandingPage && currentRoute === 'social',
+      onClick: () => handleNav(() => onNavigateApp('social')),
+    },
     ...(user
       ? [
           {

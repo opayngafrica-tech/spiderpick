@@ -64,8 +64,46 @@ export interface PostItem {
 }
 
 export interface NotificationItem {
-  id: number;
+  id: number | string;
   x: string;
   m?: number;
   t: number;
+  title?: string;
+  type?: 'info' | 'banker' | 'score' | 'promo' | string;
+  created_at?: string;
 }
+
+export type UserRole = 'admin' | 'moderator' | 'user';
+
+export interface AppUser {
+  id?: string;
+  n: string;
+  e: string;
+  role?: UserRole;
+  isVip?: boolean;
+  subscriptionTier?: string;
+}
+
+export interface UserRoleRecord {
+  id: string;
+  user_id: string;
+  role: UserRole;
+  assigned_by?: string;
+  created_at?: string;
+  email?: string;
+  full_name?: string;
+}
+
+export interface SocialHandleItem {
+  id: string;
+  name: string;
+  handle: string;
+  url: string;
+  isActive: boolean;
+  color: string;
+  bgGradient: string;
+  description: string;
+  badge?: string;
+  display_order?: number;
+}
+

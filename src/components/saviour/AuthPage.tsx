@@ -10,7 +10,7 @@ interface AuthPageProps {
     n: string;
     e: string;
     id?: string;
-    role?: 'admin' | 'user';
+    role?: 'admin' | 'moderator' | 'user';
     isVip?: boolean;
     subscriptionTier?: string;
   }) => void;

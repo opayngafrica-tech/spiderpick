@@ -7,7 +7,7 @@ interface MembershipPageProps {
     id?: string;
     n: string;
     e: string;
-    role?: 'admin' | 'user';
+    role?: 'admin' | 'moderator' | 'user';
     isVip?: boolean;
     subscriptionTier?: string;
   } | null;

@@ -123,6 +123,13 @@ export const UnifiedNavbar: React.FC<UnifiedNavbarProps> = ({
           >
             Feed
           </a>
+          <a
+            className={!isLandingPage && currentRoute === 'social' ? 'active' : ''}
+            onClick={() => onNavigateApp('social')}
+            style={{ cursor: 'pointer' }}
+          >
+            Socials
+          </a>
         </div>
 
         {/* Right Action Area - DESKTOP ONLY on app header (Mobile viewers use bottom stationary bar & profile tab) */}

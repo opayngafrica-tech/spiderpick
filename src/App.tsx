@@ -15,6 +15,9 @@ import { LegalPage } from './components/saviour/LegalPage';
 import { BottomNav } from './components/saviour/BottomNav';
 import { DesktopHeader } from './components/saviour/DesktopHeader';
 import { MembershipPage } from './components/saviour/MembershipPage';
+import { SocialPage } from './components/saviour/SocialPage';
+import { SocialHandleItem } from './types/football';
+import { getInitialSocialLinks, saveLocalSocialLinks, fetchRemoteSocialLinks } from './lib/socialData';
 import { SideMenu } from './components/common/SideMenu';
 
 export default function App() {
@@ -54,9 +57,10 @@ export default function App() {
 
   // User state with role and VIP attributes
   const [user, setUser] = useState<{
+    id?: string;
     n: string;
     e: string;
-    role?: 'admin' | 'user';
+    role?: 'admin' | 'moderator' | 'user';
     isVip?: boolean;
     subscriptionTier?: string;
   } | null>(() => {
@@ -83,7 +87,7 @@ export default function App() {
     }
   }, [user]);
 
-  const handleUpdateUserRole = (newRole: 'admin' | 'user') => {
+  const handleUpdateUserRole = (newRole: 'admin' | 'moderator' | 'user') => {
     if (!user) {
       const demoUser = { n: 'Admin Manager', e: 'admin@spiderpicks.com', role: newRole, isVip: true };
       setUser(demoUser);
@@ -113,18 +117,22 @@ export default function App() {
     });
   };
 
-  // Supabase Auth Session Sync & Profile Loading
+  // Supabase Auth Session Sync & Profile Loading with user_roles RBAC
   useEffect(() => {
     async function syncSession(authUser: any) {
       if (!authUser) return;
       try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .maybeSingle();
+        const [profileRes, roleRes] = await Promise.all([
+          supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle(),
+          supabase.from('user_roles').select('role').eq('user_id', authUser.id).maybeSingle(),
+        ]);
+        const profile = profileRes.data;
+        const roleData = roleRes.data;
 
-        const userRole = (profile?.role === 'admin' || profile?.subscription_tier === 'admin') ? 'admin' : 'user';
+        const userRole: 'admin' | 'moderator' | 'user' =
+          (roleData?.role as any) ||
+          ((profile?.role === 'admin' || profile?.subscription_tier === 'admin') ? 'admin' : (profile?.role as any) || 'user');
+
         const subTier = profile?.subscription_tier || 'free';
         const isVip = subTier === 'vip' || userRole === 'admin';
         const displayName = profile?.full_name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0];
@@ -133,7 +141,7 @@ export default function App() {
           id: authUser.id,
           n: displayName,
           e: authUser.email,
-          role: userRole as 'admin' | 'user',
+          role: userRole,
           subscriptionTier: subTier,
           isVip,
         };
@@ -297,9 +305,9 @@ export default function App() {
     }
 
     // 4. Explicit App Tab routes
-    const appTabs = ['live', 'picks', 'analysis', 'membership', 'profile', 'notifications', 'feed'];
+    const appTabs = ['live', 'picks', 'analysis', 'membership', 'profile', 'notifications', 'feed', 'social', 'community'];
     if (appTabs.includes(raw) || raw.startsWith('m/')) {
-      return { flow: 'app', route: raw === 'feed' ? '' : raw, authMode: 'in', legalKey: 'privacy' };
+      return { flow: 'app', route: raw === 'feed' ? '' : raw === 'community' ? 'social' : raw, authMode: 'in', legalKey: 'privacy' };
     }
 
     // 5. Fallback to localStorage saved flow if hash is empty
@@ -457,8 +465,138 @@ export default function App() {
     };
   }, []);
 
+  // Dynamic Realtime Notifications state
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('sa_notifications');
+      return saved ? JSON.parse(saved) : NT;
+    } catch {
+      return NT;
+    }
+  });
+
+  // Dynamic Social Links state
+  const [socialLinks, setSocialLinks] = useState<SocialHandleItem[]>(getInitialSocialLinks);
+
+  // Sync Notifications & Social Links via Supabase Realtime
+  useEffect(() => {
+    async function loadNotifications() {
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (data && data.length > 0) {
+          const remoteNotifs: NotificationItem[] = data.map((d: any) => ({
+            id: d.id,
+            x: d.message || d.title,
+            title: d.title,
+            m: d.match_id || d.fixture_id,
+            t: d.created_at ? new Date(d.created_at).getTime() : Date.now(),
+            type: d.type || 'info',
+            created_at: d.created_at,
+          }));
+
+          setNotifications((prev) => {
+            const map = new Map<string | number, NotificationItem>();
+            remoteNotifs.forEach((n) => map.set(n.id, n));
+            prev.forEach((n) => {
+              if (!map.has(n.id)) map.set(n.id, n);
+            });
+            const merged = Array.from(map.values()).sort((a, b) => b.t - a.t);
+            localStorage.setItem('sa_notifications', JSON.stringify(merged));
+            return merged;
+          });
+        }
+      } catch (err) {
+        console.warn('Realtime notifications initial load:', err);
+      }
+    }
+
+    loadNotifications();
+
+    // Supabase Realtime Channel for Notifications
+    const notifChannel = supabase
+      .channel('realtime_public_notifications')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'notifications' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const row = payload.new;
+            const newItem: NotificationItem = {
+              id: row.id,
+              x: row.message || row.title,
+              title: row.title,
+              m: row.match_id || row.fixture_id,
+              t: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
+              type: row.type || 'info',
+              created_at: row.created_at,
+            };
+            setNotifications((prev) => {
+              const updated = [newItem, ...prev.filter((n) => n.id !== newItem.id)];
+              localStorage.setItem('sa_notifications', JSON.stringify(updated));
+              return updated;
+            });
+          } else if (payload.eventType === 'DELETE') {
+            setNotifications((prev) => {
+              const updated = prev.filter((n) => n.id !== payload.old.id);
+              localStorage.setItem('sa_notifications', JSON.stringify(updated));
+              return updated;
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            setNotifications((prev) => {
+              const updated = prev.map((n) =>
+                n.id === payload.new.id
+                  ? {
+                      ...n,
+                      x: payload.new.message || payload.new.title,
+                      title: payload.new.title,
+                    }
+                  : n
+              );
+              localStorage.setItem('sa_notifications', JSON.stringify(updated));
+              return updated;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    // Load and Subscribe to Social Links
+    async function loadSocials() {
+      const remote = await fetchRemoteSocialLinks();
+      if (remote && remote.length > 0) {
+        setSocialLinks(remote);
+        saveLocalSocialLinks(remote);
+      }
+    }
+    loadSocials();
+
+    const socialChannel = supabase
+      .channel('realtime_public_social_links')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'social_links' },
+        async () => {
+          const refreshed = await fetchRemoteSocialLinks();
+          if (refreshed) {
+            setSocialLinks(refreshed);
+            saveLocalSocialLinks(refreshed);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(notifChannel);
+      supabase.removeChannel(socialChannel);
+    };
+  }, []);
+
   // Notifications read state
-  const [readNotifIds, setReadNotifIds] = useState<number[]>(() => {
+  const [readNotifIds, setReadNotifIds] = useState<(number | string)[]>(() => {
     try {
       const saved = localStorage.getItem('sa_nread');
       return saved ? JSON.parse(saved) : [];
@@ -473,7 +611,7 @@ export default function App() {
     } catch {}
   }, [readNotifIds]);
 
-  const unreadCount = NT.filter((n) => !readNotifIds.includes(n.id)).length;
+  const unreadCount = notifications.filter((n) => !readNotifIds.includes(n.id)).length;
 
   // Listen to hash changes and keep URL in sync
   useEffect(() => {
@@ -582,7 +720,7 @@ export default function App() {
   };
 
   // Auth Handlers
-  const handleAuthSuccess = (authenticatedUser: { n: string; e: string; role?: 'admin' | 'user' }) => {
+  const handleAuthSuccess = (authenticatedUser: { n: string; e: string; role?: 'admin' | 'moderator' | 'user' }) => {
     const fullUser = {
       ...authenticatedUser,
       role: authenticatedUser.role || 'user',
@@ -719,12 +857,55 @@ export default function App() {
 
   // Notifications actions
   const handleMarkAllRead = () => {
-    setReadNotifIds(NT.map((n) => n.id));
+    setReadNotifIds(notifications.map((n) => n.id));
   };
 
-  const handleReadNotification = (id: number) => {
+  const handleReadNotification = (id: number | string) => {
     if (!readNotifIds.includes(id)) {
       setReadNotifIds((prev) => [...prev, id]);
+    }
+  };
+
+  const handleBroadcastNotification = async (notif: {
+    title: string;
+    message: string;
+    type?: string;
+    matchId?: number;
+  }) => {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .insert({
+          title: notif.title,
+          message: notif.message,
+          type: notif.type || 'info',
+          user_id: null,
+        })
+        .select()
+        .single();
+
+      if (data) {
+        const newItem: NotificationItem = {
+          id: data.id,
+          x: data.message || data.title,
+          title: data.title,
+          m: data.match_id || data.fixture_id,
+          t: new Date(data.created_at).getTime(),
+          type: data.type || 'info',
+          created_at: data.created_at,
+        };
+        setNotifications((prev) => [newItem, ...prev.filter((n) => n.id !== newItem.id)]);
+      }
+    } catch (err) {
+      console.warn('Fallback inserting local notification:', err);
+      const fallbackItem: NotificationItem = {
+        id: Date.now(),
+        x: notif.message,
+        title: notif.title,
+        t: Date.now(),
+        type: notif.type || 'info',
+      };
+      setNotifications((prev) => [fallbackItem, ...prev]);
     }
   };
 
@@ -875,12 +1056,23 @@ export default function App() {
         </div>
       ) : isNotifications ? (
         <NotificationsPage
-          notifications={NT}
+          notifications={notifications}
           readIds={readNotifIds}
           onMarkAllRead={handleMarkAllRead}
           onReadNotification={handleReadNotification}
           onOpenMatch={(mId) => navigateTo(`m/${mId}`)}
           onBack={() => navigateTo('')}
+          user={user}
+          onSendNotification={handleBroadcastNotification}
+        />
+      ) : route === 'social' ? (
+        <SocialPage
+          user={user}
+          socialLinks={socialLinks}
+          onUpdateSocialLinks={setSocialLinks}
+          onBack={() => navigateTo('')}
+          onOpenNotifications={() => navigateTo('notifications')}
+          onOpenSignIn={() => promptSignIn('in')}
         />
       ) : isMatchDetail && matchId ? (
         <MatchDetailPage

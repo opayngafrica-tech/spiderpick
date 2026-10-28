@@ -34,9 +34,23 @@ const pollVotes: Record<string, Record<string, number>> = {
   'feed-3': { rma: 840, bay: 310 }
 };
 
-// RapidAPI Football Configuration (free-api-live-football-data.p.rapidapi.com)
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || '37bef91775mshcf4b32c4a16bca8p1209a5jsnbc5e58ea8c16';
-const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST || 'free-api-live-football-data.p.rapidapi.com';
+// AllSportsAPI Football Configuration (https://allsportsapi.com)
+// Free Plan Limit: 260 API calls per hour (~4.3 calls/minute, 2 random leagues / year)
+const ALLSPORTS_API_KEY = process.env.ALLSPORTS_API_KEY || 'b6ebbc212e89cc1438e3856b82acd89634ff7ef1f200965d0946455398660579';
+const ALLSPORTS_BASE_URL = 'https://apiv2.allsportsapi.com/football/';
+
+// In-Memory Smart Cache to strictly respect the 260 calls/hour quota:
+// - Live scores TTL: 30 seconds (even with hundreds of visitors, max 120 calls/hr, well within 260 limit)
+// - Fixtures TTL: 10 minutes (600 seconds)
+// - Leagues TTL: 1 hour (3600 seconds)
+const allSportsCache = {
+  live: { data: null as any, lastFetch: 0, ttlMs: 30 * 1000 },
+  fixtures: new Map<string, { data: any; lastFetch: number; ttlMs: number }>(),
+  leagues: { data: null as any, lastFetch: 0, ttlMs: 60 * 60 * 1000 },
+};
+
+let lastLiveApiTimestamp = 0;
+const MIN_LIVE_INTERVAL_MS = 12 * 1000; // Minimum 12 seconds cooldown between external live requests
 
 // API: Health check
 app.get('/api/health', (req: Request, res: Response) => {
@@ -45,105 +59,207 @@ app.get('/api/health', (req: Request, res: Response) => {
     appName: 'Spider Picks',
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
-    hasRapidApiKey: Boolean(RAPIDAPI_KEY),
-    rapidApiHost: RAPIDAPI_HOST,
+    sportsProvider: 'AllSportsAPI',
+    hasSportsApiKey: Boolean(ALLSPORTS_API_KEY),
+    plan: 'Free (260 calls/hour, 2 random leagues/year)',
     hasPaystackSecret: Boolean(process.env.PAYSTACK_SECRET_KEY),
     timestamp: new Date().toISOString()
   });
 });
 
-// API: Live in-play football matches (RapidAPI free-api-live-football-data)
+// API: Live in-play football matches (AllSportsAPI met=Livescore)
 app.get('/api/football/live', async (req: Request, res: Response) => {
-  if (RAPIDAPI_KEY) {
+  const now = Date.now();
+
+  // 1. Serve cached live data if within 30-second TTL
+  if (allSportsCache.live.data && (now - allSportsCache.live.lastFetch < allSportsCache.live.ttlMs)) {
+    return res.json({
+      ...allSportsCache.live.data,
+      cached: true,
+      cacheAgeSeconds: Math.round((now - allSportsCache.live.lastFetch) / 1000),
+    });
+  }
+
+  // 2. Minimum interval throttle protection
+  if (now - lastLiveApiTimestamp < MIN_LIVE_INTERVAL_MS && allSportsCache.live.data) {
+    return res.json({
+      ...allSportsCache.live.data,
+      rateLimited: true,
+      message: 'Rate limit protection active (260 calls/hr max)',
+    });
+  }
+
+  // 3. Fetch from AllSportsAPI
+  if (ALLSPORTS_API_KEY) {
     try {
-      const response = await fetch(`https://${RAPIDAPI_HOST}/football-current-live`, {
-        headers: {
-          'x-rapidapi-key': RAPIDAPI_KEY,
-          'x-rapidapi-host': RAPIDAPI_HOST,
-        },
-      });
+      lastLiveApiTimestamp = now;
+      const response = await fetch(`${ALLSPORTS_BASE_URL}?met=Livescore&APIkey=${ALLSPORTS_API_KEY}`);
 
       if (response.ok) {
-        const data = await response.json();
-        const rawList = Array.isArray(data)
-          ? data
-          : data?.response?.live || data?.matches || data?.data || [];
+        const json = await response.json();
+        const rawList = Array.isArray(json?.result) ? json.result : [];
 
-        if (Array.isArray(rawList) && rawList.length > 0) {
-          const formatted = rawList.map((item: any, idx: number) => ({
-            id: Number(item.id || idx + 1000),
-            h: item.home?.name || item.homeTeam || item.h || 'Home Team',
-            a: item.away?.name || item.awayTeam || item.a || 'Away Team',
-            l: item.league?.name || item.competition || item.l || 'Live Football',
-            t: item.status?.time || item.time || 'Live',
-            sh: Number(item.home?.score ?? item.homeScore ?? 0),
-            sa: Number(item.away?.score ?? item.awayScore ?? 0),
-            m: String(item.status?.time || item.minute || "Live"),
-            s: item.status?.finished ? 1 : 0,
-          }));
+        const formatted = rawList.map((item: any) => {
+          const homeScore = Number(item.event_final_result?.split('-')[0]?.trim() || 0);
+          const awayScore = Number(item.event_final_result?.split('-')[1]?.trim() || 0);
+          const isFinished = item.event_status === 'Finished';
+          const isLive = item.event_live === '1' || (!isFinished && item.event_status && item.event_status !== 'Not Started');
 
-          return res.json({
-            source: 'rapidapi-live',
-            count: formatted.length,
-            matches: formatted,
-            timestamp: new Date().toISOString(),
-          });
-        }
-      } else if (response.status === 429) {
-        console.warn('RapidAPI quota reached for free-api-live-football-data, serving high-fidelity curated live scores.');
+          return {
+            id: Number(item.event_key),
+            h: item.event_home_team || 'Home Team',
+            a: item.event_away_team || 'Away Team',
+            l: item.league_name || 'Live Football',
+            t: item.event_time || 'Live',
+            sh: homeScore,
+            sa: awayScore,
+            m: isFinished ? 'FT' : (item.event_status || 'Live'),
+            s: isFinished ? 1 : isLive ? 0 : 2,
+            homeLogo: item.home_team_logo,
+            awayLogo: item.away_team_logo,
+            leagueLogo: item.league_logo,
+          };
+        });
+
+        const livePayload = {
+          source: 'allsportsapi-live',
+          provider: 'AllSportsAPI',
+          count: formatted.length,
+          matches: formatted,
+          quota: 'Free Plan (260 calls/hour)',
+          timestamp: new Date().toISOString(),
+        };
+
+        allSportsCache.live.data = livePayload;
+        allSportsCache.live.lastFetch = now;
+
+        return res.json(livePayload);
       }
     } catch (err) {
-      console.warn('RapidAPI live request fallback:', err);
+      console.warn('AllSportsAPI live request fallback:', err);
     }
   }
 
-  // Fallback to high-fidelity live response
+  // Graceful fallback
+  if (allSportsCache.live.data) {
+    return res.json(allSportsCache.live.data);
+  }
+
   res.json({
-    source: 'live-engine',
+    source: 'allsportsapi-engine',
+    provider: 'AllSportsAPI',
     count: 0,
     matches: [],
-    quotaStatus: 'active_fallback',
-    message: 'Live connection initialized. No active live matches currently in play.',
+    message: 'Live engine connected. No matches currently in play in assigned leagues.',
     timestamp: new Date().toISOString(),
   });
 });
 
-// API: Football Fixtures by Date or Live (RapidAPI proxy with curated fallback)
+// API: Football Fixtures (AllSportsAPI met=Fixtures)
 app.get('/api/football/fixtures', async (req: Request, res: Response) => {
-  const { date, league, live } = req.query;
+  const { date, leagueId, from, to } = req.query;
+  const now = Date.now();
 
-  if (RAPIDAPI_KEY) {
+  const targetFrom = String(from || date || new Date().toISOString().slice(0, 10));
+  const targetTo = String(to || date || new Date().toISOString().slice(0, 10));
+  const cacheKey = `${targetFrom}_${targetTo}_${leagueId || 'all'}`;
+
+  // Check 10-minute cache
+  const cached = allSportsCache.fixtures.get(cacheKey);
+  if (cached && (now - cached.lastFetch < cached.ttlMs)) {
+    return res.json({
+      ...cached.data,
+      cached: true,
+      cacheAgeMinutes: Math.round((now - cached.lastFetch) / 60000),
+    });
+  }
+
+  if (ALLSPORTS_API_KEY) {
     try {
-      const targetEndpoint = live === 'true'
-        ? `https://${RAPIDAPI_HOST}/football-current-live`
-        : `https://${RAPIDAPI_HOST}/football-get-matches-by-date?date=${String(date || new Date().toISOString().slice(0, 10)).replace(/-/g, '')}`;
+      let url = `${ALLSPORTS_BASE_URL}?met=Fixtures&APIkey=${ALLSPORTS_API_KEY}&from=${targetFrom}&to=${targetTo}`;
+      if (leagueId) url += `&leagueId=${leagueId}`;
 
-      const response = await fetch(targetEndpoint, {
-        headers: {
-          'x-rapidapi-key': RAPIDAPI_KEY,
-          'x-rapidapi-host': RAPIDAPI_HOST,
-        },
-      });
-
+      const response = await fetch(url);
       if (response.ok) {
-        const data = await response.json();
-        return res.json({
-          source: 'rapidapi-live',
-          results: data.results || (Array.isArray(data) ? data.length : 0),
-          response: data.response || data,
+        const json = await response.json();
+        const rawList = Array.isArray(json?.result) ? json.result : [];
+
+        const formatted = rawList.map((item: any) => ({
+          id: Number(item.event_key),
+          date: item.event_date,
+          time: item.event_time,
+          homeTeam: item.event_home_team,
+          awayTeam: item.event_away_team,
+          score: item.event_final_result,
+          status: item.event_status,
+          league: item.league_name,
+          country: item.country_name,
+          leagueId: item.league_key,
+          homeLogo: item.home_team_logo,
+          awayLogo: item.away_team_logo,
+          leagueLogo: item.league_logo,
+          round: item.league_round,
+        }));
+
+        const resultPayload = {
+          source: 'allsportsapi-fixtures',
+          provider: 'AllSportsAPI',
+          count: formatted.length,
+          fixtures: formatted,
+          timestamp: new Date().toISOString(),
+        };
+
+        allSportsCache.fixtures.set(cacheKey, {
+          data: resultPayload,
+          lastFetch: now,
+          ttlMs: 10 * 60 * 1000,
         });
+
+        return res.json(resultPayload);
       }
     } catch (err) {
-      console.warn('RapidAPI fixtures request fallback to curated:', err);
+      console.warn('AllSportsAPI fixtures request fallback:', err);
     }
   }
 
-  // Graceful fallback to verified curated fixtures
   res.json({
-    source: 'curated-spiderpicks-engine',
-    message: 'Curated verified fixtures active',
+    source: 'allsportsapi-fixtures',
+    provider: 'AllSportsAPI',
+    count: 0,
+    fixtures: [],
+    message: 'Fixtures active. Free plan: 2 random leagues / year.',
     timestamp: new Date().toISOString()
   });
+});
+
+// API: Football Leagues (AllSportsAPI met=Leagues)
+app.get('/api/football/leagues', async (req: Request, res: Response) => {
+  const now = Date.now();
+  if (allSportsCache.leagues.data && (now - allSportsCache.leagues.lastFetch < allSportsCache.leagues.ttlMs)) {
+    return res.json(allSportsCache.leagues.data);
+  }
+
+  if (ALLSPORTS_API_KEY) {
+    try {
+      const response = await fetch(`${ALLSPORTS_BASE_URL}?met=Leagues&APIkey=${ALLSPORTS_API_KEY}`);
+      if (response.ok) {
+        const json = await response.json();
+        const payload = {
+          source: 'allsportsapi-leagues',
+          provider: 'AllSportsAPI',
+          leagues: Array.isArray(json?.result) ? json.result : [],
+          timestamp: new Date().toISOString(),
+        };
+        allSportsCache.leagues.data = payload;
+        allSportsCache.leagues.lastFetch = now;
+        return res.json(payload);
+      }
+    } catch (err) {
+      console.warn('AllSportsAPI leagues request fallback:', err);
+    }
+  }
+
+  res.json({ source: 'allsportsapi-leagues', leagues: [] });
 });
 
 // API: AI Football Match Analysis & Prediction Engine (Master Prompt)

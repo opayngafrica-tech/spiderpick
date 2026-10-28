@@ -14,7 +14,7 @@ export interface SubscribedUserRecord {
 }
 
 interface ProfilePageProps {
-  user: { n: string; e: string; role?: 'admin' | 'user'; isVip?: boolean; subscriptionTier?: string } | null;
+  user: { n: string; e: string; role?: 'admin' | 'moderator' | 'user'; isVip?: boolean; subscriptionTier?: string } | null;
   isDark: boolean;
   onToggleTheme: () => void;
   onOpenNotifications: () => void;
@@ -24,7 +24,7 @@ interface ProfilePageProps {
   onSignIn?: () => void;
   onOpenMenu?: () => void;
   unreadCount: number;
-  onUpdateRole?: (newRole: 'admin' | 'user') => void;
+  onUpdateRole?: (newRole: 'admin' | 'moderator' | 'user') => void;
   tabDisabledState?: Record<string, boolean>;
   onToggleTab?: (tabKey: string) => void;
   matches?: MatchItem[];
@@ -75,14 +75,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     return localStorage.getItem('sa_api_paystack') || 'sk_live_' + '•'.repeat(22) + '84b2';
   });
   const [sportsKeyInput, setSportsKeyInput] = useState(() => {
-    return localStorage.getItem('sa_api_sports') || '37be' + '•'.repeat(26) + '8a16';
+    return localStorage.getItem('sa_api_sports') || 'b6eb' + '•'.repeat(24) + '0579';
   });
-  const [rapidApiHostInput, setRapidApiHostInput] = useState(() => {
-    return localStorage.getItem('sa_api_sports_host') || 'free-api-live-football-data.p.rapidapi.com';
+  const [allSportsProviderInput, setAllSportsProviderInput] = useState(() => {
+    return localStorage.getItem('sa_api_sports_host') || 'apiv2.allsportsapi.com (AllSportsAPI)';
   });
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [activeAdminTab, setActiveAdminTab] = useState<'analytics' | 'tabs' | 'predictions' | 'subscribers' | 'apis' | 'database'>('analytics');
+  const [activeAdminTab, setActiveAdminTab] = useState<'analytics' | 'tabs' | 'predictions' | 'roles' | 'subscribers' | 'apis' | 'database'>('analytics');
+
+  // User Roles & RBAC (Admin & Moderator management)
+  const [roleUsers, setRoleUsers] = useState<{ id: string; email: string; full_name: string; role: 'admin' | 'moderator' | 'user'; tier: string }[]>([]);
+  const [roleSearch, setRoleSearch] = useState('');
+  const [loadingRoles, setLoadingRoles] = useState(false);
+  const [isUpdatingRole, setIsUpdatingRole] = useState(false);
 
   // Manual Pick Upload in Admin Control Center
   const [pickType, setPickType] = useState<'free' | 'vip'>('free');
@@ -138,12 +144,82 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     fetchDatabaseMetrics();
   }, [matches]);
 
+  const loadUserRoles = async () => {
+    if (!isSupabaseConfigured || !supabase) return;
+    try {
+      setLoadingRoles(true);
+      const [profilesRes, rolesRes] = await Promise.all([
+        supabase.from('profiles').select('id, email, full_name, role, subscription_tier'),
+        supabase.from('user_roles').select('*'),
+      ]);
+
+      const roleMap: Record<string, 'admin' | 'moderator' | 'user'> = {};
+      (rolesRes.data || []).forEach((r: any) => {
+        roleMap[r.user_id] = r.role;
+      });
+
+      const list = (profilesRes.data || []).map((p: any) => ({
+        id: p.id,
+        email: p.email || 'No email registered',
+        full_name: p.full_name || 'Member',
+        role: (roleMap[p.id] || p.role || 'user') as 'admin' | 'moderator' | 'user',
+        tier: p.subscription_tier || 'free',
+      }));
+
+      setRoleUsers(list);
+    } catch (err) {
+      console.warn('Failed to load user roles:', err);
+    } finally {
+      setLoadingRoles(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeAdminTab === 'roles') {
+      loadUserRoles();
+    }
+  }, [activeAdminTab]);
+
+  const handleSetUserRole = async (targetUserId: string, newRole: 'admin' | 'moderator' | 'user') => {
+    try {
+      setIsUpdatingRole(true);
+
+      // Attempt 1: Call atomic set_user_role RPC function
+      const { error: rpcError } = await supabase.rpc('set_user_role', {
+        target_user_id: targetUserId,
+        new_role: newRole,
+      });
+
+      if (rpcError) {
+        console.warn('RPC set_user_role fallback, attempting direct table updates:', rpcError.message);
+        // Fallback: delete previous role and insert new role
+        await supabase.from('user_roles').delete().eq('user_id', targetUserId);
+        await supabase.from('user_roles').insert({
+          user_id: targetUserId,
+          role: newRole,
+        });
+        await supabase.from('profiles').update({ role: newRole }).eq('id', targetUserId);
+      }
+
+      // Update local state immediately for instant visual feedback
+      setRoleUsers((prev) =>
+        prev.map((u) => (u.id === targetUserId ? { ...u, role: newRole } : u))
+      );
+      showToast(`User role successfully changed to ${newRole.toUpperCase()}`);
+    } catch (err) {
+      console.error('Error updating role:', err);
+      showToast('Error updating role in database');
+    } finally {
+      setIsUpdatingRole(false);
+    }
+  };
+
   const handleSaveApiKeys = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem('sa_api_gemini', geminiKeyInput);
     localStorage.setItem('sa_api_paystack', paystackKeyInput);
     localStorage.setItem('sa_api_sports', sportsKeyInput);
-    localStorage.setItem('sa_api_sports_host', rapidApiHostInput);
+    localStorage.setItem('sa_api_sports_host', allSportsProviderInput);
     showToast('API credentials securely masked and saved.');
   };
 
@@ -431,6 +507,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               { id: 'analytics', label: 'Platform Analytics' },
               { id: 'tabs', label: 'Tab Controls & Live' },
               { id: 'predictions', label: 'Predictions (Free & VIP)' },
+              { id: 'roles', label: 'User Roles & Team' },
               { id: 'subscribers', label: `Subscribers (${subscribers.length})` },
               { id: 'apis', label: 'Masked APIs' },
               { id: 'database', label: 'Database Health' },
@@ -850,6 +927,185 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
           )}
 
+          {/* Sub-panel: User Roles & RBAC (Admin & Moderator management) */}
+          {activeAdminTab === 'roles' && (
+            <div className="card" style={{ padding: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--tx)', margin: 0 }}>
+                    User Role Management (Admin & Moderator)
+                  </h3>
+                  <span style={{ fontSize: '12px', color: 'var(--mu)' }}>
+                    Assign staff and team members as Admins or Moderators stored in the PostgreSQL <code>user_roles</code> table.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={loadUserRoles}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    background: 'var(--s2)',
+                    border: '1px solid var(--b)',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: 'var(--tx)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ↻ Refresh Roles
+                </button>
+              </div>
+
+              {/* Search Bar */}
+              <div style={{ marginBottom: '16px' }}>
+                <input
+                  type="text"
+                  placeholder="Search user by email or name..."
+                  value={roleSearch}
+                  onChange={(e) => setRoleSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: 'var(--s2)',
+                    border: '1px solid var(--b)',
+                    color: 'var(--tx)',
+                    fontSize: '13px',
+                  }}
+                />
+              </div>
+
+              {/* Roles List */}
+              {loadingRoles ? (
+                <div style={{ textAlign: 'center', padding: '30px', color: 'var(--mu)' }}>Loading users...</div>
+              ) : roleUsers.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '36px 16px', background: 'var(--s2)', borderRadius: '12px' }}>
+                  <b style={{ fontSize: '14px', color: 'var(--tx)', display: 'block', marginBottom: '4px' }}>
+                    No Registered Users Found in Database
+                  </b>
+                  <p style={{ fontSize: '12px', color: 'var(--mu)', margin: 0 }}>
+                    When visitors create an account via Supabase Auth, they will be listed here with options to assign Admin or Moderator privileges.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {roleUsers
+                    .filter((u) => !roleSearch || u.email.toLowerCase().includes(roleSearch.toLowerCase()) || u.full_name.toLowerCase().includes(roleSearch.toLowerCase()))
+                    .map((ru) => (
+                      <div
+                        key={ru.id}
+                        style={{
+                          background: 'var(--s2)',
+                          padding: '12px 14px',
+                          borderRadius: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          border: '1px solid var(--b)',
+                          flexWrap: 'wrap',
+                          gap: '10px',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <b style={{ fontSize: '13px', color: 'var(--tx)' }}>{ru.full_name}</b>
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                fontWeight: 800,
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                textTransform: 'uppercase',
+                                background:
+                                  ru.role === 'admin' ? '#dcfce7' : ru.role === 'moderator' ? '#e0e7ff' : 'rgba(100,116,139,0.12)',
+                                color:
+                                  ru.role === 'admin' ? '#15803d' : ru.role === 'moderator' ? '#4338ca' : 'var(--mu)',
+                              }}
+                            >
+                              {ru.role}
+                            </span>
+                          </div>
+                          <span style={{ fontSize: '11px', color: 'var(--mu)', display: 'block' }}>{ru.email}</span>
+                          <span style={{ fontSize: '10px', color: 'var(--mu)' }}>Tier: {ru.tier.toUpperCase()}</span>
+                        </div>
+
+                        {/* Role Selection Dropdown */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <label
+                            htmlFor={`role-select-${ru.id}`}
+                            style={{ fontSize: '11px', fontWeight: 800, color: 'var(--mu)' }}
+                          >
+                            Role:
+                          </label>
+                          <div style={{ position: 'relative', display: 'inline-block' }}>
+                            <select
+                              id={`role-select-${ru.id}`}
+                              value={ru.role}
+                              disabled={isUpdatingRole}
+                              onChange={(e) =>
+                                handleSetUserRole(ru.id, e.target.value as 'user' | 'moderator' | 'admin')
+                              }
+                              style={{
+                                padding: '6px 30px 6px 12px',
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                fontWeight: 800,
+                                cursor: isUpdatingRole ? 'not-allowed' : 'pointer',
+                                border:
+                                  ru.role === 'admin'
+                                    ? '1.5px solid #10b981'
+                                    : ru.role === 'moderator'
+                                    ? '1.5px solid #6366f1'
+                                    : '1px solid var(--b)',
+                                background:
+                                  ru.role === 'admin'
+                                    ? '#dcfce7'
+                                    : ru.role === 'moderator'
+                                    ? '#e0e7ff'
+                                    : 'var(--s2)',
+                                color:
+                                  ru.role === 'admin'
+                                    ? '#15803d'
+                                    : ru.role === 'moderator'
+                                    ? '#4338ca'
+                                    : 'var(--tx)',
+                                outline: 'none',
+                                appearance: 'none',
+                                WebkitAppearance: 'none',
+                              }}
+                            >
+                              <option value="user">User (Regular)</option>
+                              <option value="moderator">Moderator</option>
+                              <option value="admin">Administrator</option>
+                            </select>
+                            <span
+                              style={{
+                                position: 'absolute',
+                                right: '10px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                pointerEvents: 'none',
+                                fontSize: '10px',
+                                color:
+                                  ru.role === 'admin'
+                                    ? '#15803d'
+                                    : ru.role === 'moderator'
+                                    ? '#4338ca'
+                                    : 'var(--mu)',
+                              }}
+                            >
+                              ▼
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Sub-panel 4: Subscribers (No mock data, empty state) */}
           {activeAdminTab === 'subscribers' && (
             <div className="card" style={{ padding: '20px' }}>
@@ -960,25 +1216,32 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: 'var(--mu)', marginBottom: '4px' }}>
-                      Football Live API Key
-                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--mu)' }}>
+                        AllSportsAPI Key (Football Livescore & Fixtures)
+                      </label>
+                      <span style={{ fontSize: '10px', fontWeight: 800, background: '#dcfce7', color: '#15803d', padding: '2px 6px', borderRadius: '4px' }}>
+                        Free Plan (260 calls/hr)
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={sportsKeyInput}
                       onChange={(e) => setSportsKeyInput(e.target.value)}
+                      placeholder="b6ebbc212e89cc1438e3856b82acd89634ff7ef1f200965d0946455398660579"
                       style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', background: 'var(--s2)', border: '1px solid var(--b)', fontSize: '13px', color: 'var(--tx)', fontFamily: 'monospace' }}
                     />
                   </div>
 
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, color: 'var(--mu)', marginBottom: '4px' }}>
-                      Football API Host
+                      Football Provider & Endpoint
                     </label>
                     <input
                       type="text"
-                      value={rapidApiHostInput}
-                      onChange={(e) => setRapidApiHostInput(e.target.value)}
+                      value={allSportsProviderInput}
+                      onChange={(e) => setAllSportsProviderInput(e.target.value)}
+                      placeholder="https://apiv2.allsportsapi.com/football/"
                       style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', background: 'var(--s2)', border: '1px solid var(--b)', fontSize: '13px', color: 'var(--tx)', fontFamily: 'monospace' }}
                     />
                   </div>
